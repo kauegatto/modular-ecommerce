@@ -27,11 +27,11 @@ func (n *NatsOrderAdapter) PublishOrderPlaced(event outgoing.OrderPlaced) error 
 	return n.nc.Publish("domain.order.placed", data)
 }
 
-func (n *NatsOrderAdapter) OnPaymentCompleted(handler func(incoming.PaymentCompleted) error) error {
+func (n *NatsOrderAdapter) SubscribeToPaymentCompleted(handler func(incoming.PaymentCompleted) error) error {
 	_, err := n.nc.Subscribe("domain.payment.completed", func(msg *nats.Msg) {
-		log.Default().Printf("[TEST] [todo remove] received payment completed %s", string(msg.Data))
-		var event incoming.PaymentCompleted
+		log.Println("[NATS] Received payment completed event:", string(msg.Data))
 
+		var event incoming.PaymentCompleted
 		if err := json.Unmarshal(msg.Data, &event); err != nil {
 			log.Println("Error unmarshalling PaymentCompleted event:", err)
 			return

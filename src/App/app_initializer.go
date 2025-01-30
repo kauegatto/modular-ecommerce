@@ -30,7 +30,7 @@ func (ai *AppInitializer) InitializeApp() (*App, error) {
 
 	orderPublisher := messaging.NewNatsOrderAdapter(ai.natsConn)
 	orderService := services.NewOrderService(orderPublisher)
-	orderPublisher.OnPaymentCompleted(orderService.OnPaymentCompleted) // todo i dont think this is good here
+	orderPublisher.SubscribeToPaymentCompleted(orderService.OnPaymentCompleted) // todo i dont think this is good here (it's trash actually)
 	orderModule := api.NewOrderHandler(orderService)
 
 	authModule := routes.NewAuthHandler()
