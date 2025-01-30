@@ -1,56 +1,30 @@
 package main
 
 import (
-	"ecommerce/Auth/Infra/config"
-	"ecommerce/Auth/routes"
+	app "ecommerce/App"
 	"log"
 
-	"github.com/gin-gonic/gin"
+	"github.com/nats-io/nats.go"
 )
 
-type App struct {
-	router  *gin.Engine
-	modules []Module
-	config  *config.Config
-}
-
-type Module interface {
-	RegisterRoutes(router *gin.RouterGroup)
-	Name() string
-}
-
-func NewApp(config *config.Config) *App {
-	router := gin.Default()
-	return &App{
-		router:  router,
-		config:  config,
-		modules: make([]Module, 0),
-	}
-}
-
-func (a *App) RegisterModule(m Module) {
-	moduleGroup := a.router.Group("/api/" + m.Name())
-
-	m.RegisterRoutes(moduleGroup)
-	a.modules = append(a.modules, m)
-}
-
-func (a *App) Start() error {
-	return a.router.Run()
-}
-
 func main() {
-	config, err := config.LoadConfig()
+	appInitializer, err := app.NewAppInitializer()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Failed to initialize app:", err)
 	}
 
-	app := NewApp(config)
+	app, err := appInitializer.InitializeApp()
+	if err != nil {
+		log.Fatal("Failed to initialize app:", err)
+	}
 
-	authModule := routes.NewAuthHandler()
-	app.RegisterModule(authModule)
+	nc, err := nats.Connect(nats.DefaultURL)
+	if err != nil {
+		log.Fatalf("failed to connect to NATS: %v", err)
+	}
+	defer nc.Close()
 
 	if err := app.Start(); err != nil {
-		log.Fatal(err)
+		log.Fatal("Failed to start app:", err)
 	}
 }

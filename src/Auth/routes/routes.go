@@ -11,8 +11,8 @@ type AuthHandler struct {
 }
 
 func (h *AuthHandler) RegisterRoutes(router *gin.RouterGroup) {
-	router.GET("", h.handleX)
-	router.POST("", h.handleY)
+	router.POST("/login", h.handleX)
+	router.POST("/register", h.handleY)
 }
 
 func (h *AuthHandler) Name() string {
