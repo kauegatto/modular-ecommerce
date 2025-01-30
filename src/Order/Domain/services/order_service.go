@@ -5,6 +5,7 @@ import (
 	"ecommerce/Order/Domain/events/incoming"
 	"ecommerce/Order/Domain/events/outgoing"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -30,7 +31,7 @@ func (s *OrderService) PlaceOrder(customerId string, amount domain.Money) error 
 	if err != nil {
 		return err
 	}
-
+	log.Default().Println("[PUBLISHED] ORDER_PLACED event")
 	err = s.eventPublisher.PublishOrderPlaced(outgoing.OrderPlaced{
 		OrderID:    uuid.String(),   //order.ID,
 		CustomerID: customerId,      //order.CustomerID,
