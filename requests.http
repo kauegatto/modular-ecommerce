@@ -1,0 +1,8 @@
+### Place Order Request
+POST http://localhost:8080/api/order/place
+Content-Type: application/json
+
+{
+  "customer_id": "12345",
+  "amount": 100.50
+}
