@@ -31,38 +31,27 @@ func NewOrderService(eventBus models.Eventbus, logger *log.Logger) (*OrderServic
 }
 
 func (s *OrderService) subscribeToEvents() error {
-	events := []models.Event{
-		&incoming.PaymentCompleted{},
-		&outgoing.OrderCancelled{},
-	}
-
-	for _, event := range events {
-		if err := s.eventBus.Subscribe(event, s.handleEvent); err != nil {
-			return fmt.Errorf("subscribe to %s: %w", event.Name(), err)
-		}
-	}
-
+	s.eventBus.Subscribe(&incoming.PaymentCompleted{}, s.handlePaymentCompleted)
+	s.eventBus.Subscribe(&outgoing.OrderCancelled{}, s.handleOrderCancelled)
 	return nil
 }
 
-func (s *OrderService) handleEvent(event models.Event) error {
-	switch e := event.(type) {
-	case *incoming.PaymentCompleted:
-		return s.handlePaymentCompleted(e)
-	case *outgoing.OrderCancelled:
-		return s.handleOrderCancelled(e)
-	default:
-		return fmt.Errorf("unknown event type: %T", event)
+func (s *OrderService) handlePaymentCompleted(event models.Event) error {
+	payment, ok := event.(*incoming.PaymentCompleted)
+	if !ok {
+		return fmt.Errorf("expected PaymentCompleted, got %T", event)
 	}
-}
-
-func (s *OrderService) handlePaymentCompleted(event *incoming.PaymentCompleted) error {
-	s.logger.Printf("[INFO] Processing payment completed for order %s", event.OrderID)
+	s.logger.Printf("[INFO] Processing payment completed for orderId %s", payment.OrderID)
 	return nil
 }
 
-func (s *OrderService) handleOrderCancelled(event *outgoing.OrderCancelled) error {
-	s.logger.Printf("[TEST] Processed Order Cancelled Event - Order_id: %s", event.OrderID)
+func (s *OrderService) handleOrderCancelled(event models.Event) error {
+	orderCancelled, ok := event.(*outgoing.OrderCancelled)
+	if !ok {
+		return fmt.Errorf("expected PaymentCompleted, got %T", event)
+	}
+
+	s.logger.Printf("[TEST] Processed Order Cancelled Event - Order_id: %s", orderCancelled.OrderID)
 	return nil
 }
 
@@ -92,5 +81,18 @@ func (s *OrderService) PlaceOrder(customerID string, amount domain.Money) error 
 	if err := s.eventBus.Publish(cancelledEvent); err != nil {
 		return fmt.Errorf("cancelled order placed event: %w", err)
 	}
-		return nil
+	return nil
+}
+
+func (s *OrderService) CancelOrder(orderID domain.OrderID, reasib string) error {
+	cancelledEvent := &outgoing.OrderCancelled{
+		OrderID:     orderID.String(),
+		CancelledAt: time.Now(),
+		Reason:      "Test",
+	}
+
+	if err := s.eventBus.Publish(cancelledEvent); err != nil {
+		return fmt.Errorf("cancelled order placed event: %w", err)
+	}
+	return nil
 }

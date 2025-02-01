@@ -32,7 +32,7 @@ func (ai *AppInitializer) InitializeApp() (*App, error) {
 
 	logger := log.New(os.Stdout, "[APP] ", log.LstdFlags)
 
-	natsEventBus := adapter.NewNatsEventbusAdapter(ai.natsConn, logger)
+	natsEventBus := adapter.NewNatsEventbusAdapter(ai.natsConn)
 
 	orderService, err := services.NewOrderService(natsEventBus, logger)
 	if err != nil {

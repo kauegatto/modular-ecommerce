@@ -5,65 +5,80 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"reflect"
+	"sync"
 
 	"github.com/nats-io/nats.go"
 )
 
 type NatsEventbusAdapter struct {
-	nc     *nats.Conn
-	logger *log.Logger
+	nc       *nats.Conn
+	handlers map[string][]func(models.Event) error
+	mu       sync.RWMutex
 }
 
-func NewNatsEventbusAdapter(nc *nats.Conn, logger *log.Logger) *NatsEventbusAdapter {
+func NewNatsEventbusAdapter(nc *nats.Conn) *NatsEventbusAdapter {
 	return &NatsEventbusAdapter{
-		nc:     nc,
-		logger: logger,
+		nc:       nc,
+		handlers: make(map[string][]func(models.Event) error),
 	}
 }
 
 func (n *NatsEventbusAdapter) Publish(event models.Event) error {
+	log := log.Default()
 	data, err := json.Marshal(event)
 	if err != nil {
-		n.logger.Printf("Unable to send message of name %s. Serialization failed: %v", event.Name(), err)
+		log.Printf("Unable to send message of name %s. Serialization failed: %v", event.Name(), err)
 		return err
 	}
+
 	err = n.nc.Publish(event.Name(), data)
 	if err != nil {
-		n.logger.Printf("Unable to send message of name %s. Publish failed: %v", event.Name(), err)
+		log.Printf("Unable to send message of name %s. Publish failed: %v", event.Name(), err)
 		return err
 	}
-	n.logger.Printf("[EVENT_PUBLISHED] - %s", event.Name())
 	return nil
 }
 
-func (n *NatsEventbusAdapter) Subscribe(event models.Event, handler func(models.Event) error) error {
-	eventType := reflect.TypeOf(event)
-	if eventType.Kind() == reflect.Ptr {
-		eventType = eventType.Elem()
-	}
+func (n *NatsEventbusAdapter) Subscribe(event models.Event, handler func(event models.Event) error) error {
 
-	_, err := n.nc.Subscribe(event.Name(), func(msg *nats.Msg) {
-		newEvent := reflect.New(eventType).Interface().(models.Event)
+	n.subscribeOnNats(event, handler)
+	return nil
+}
 
-		if err := json.Unmarshal(msg.Data, newEvent); err != nil {
-			n.logger.Printf("[ERROR] Failed to unmarshal event %s: %v", event.Name(), err)
-			return
+func (n *NatsEventbusAdapter) subscribeOnNats(event models.Event, handler func(event models.Event) error) error {
+	n.mu.Lock()
+	n.handlers[event.Name()] = append(n.handlers[event.Name()], handler)
+	n.mu.Unlock()
+
+	if len(n.handlers[event.Name()]) == 1 {
+		subscription, err := n.nc.Subscribe(event.Name(), func(msg *nats.Msg) {
+			newEvent := event
+			if err := json.Unmarshal(msg.Data, newEvent); err != nil {
+				log.Printf("Failed to unmarshal event: %v", err)
+				return
+			}
+
+			n.mu.RLock()
+			handlers := n.handlers[event.Name()]
+			n.mu.RUnlock()
+
+			for _, h := range handlers {
+				go func(handlerFunc func(models.Event) error) {
+					if err := handlerFunc(newEvent); err != nil {
+						log.Printf("Handler failed for event %s: %v", event.Name(), err)
+					}
+				}(h)
+			}
+		})
+
+		if err != nil {
+			return err
 		}
 
-		if err := handler(newEvent); err != nil {
-			n.logger.Printf("[ERROR] Handler failed for event %s: %v", event.Name(), err)
-			return
+		if !subscription.IsValid() {
+			return fmt.Errorf("invalid subscription")
 		}
-
-		n.logger.Printf("[INFO] Processed event %s", event.Name())
-	})
-
-	if err != nil {
-		n.logger.Printf("[ERROR] Failed to subscribe to event %s: %v", event.Name(), err)
-		return fmt.Errorf("subscribe to event %s: %w", event.Name(), err)
 	}
 
-	n.logger.Printf("[INFO] Subscribed to event %s", event.Name())
 	return nil
 }
