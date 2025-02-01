@@ -2,7 +2,7 @@ package incoming
 
 import (
 	domain "ecommerce/Order/Domain"
-	"ecommerce/Order/Domain/events/contracts"
+	"ecommerce/Order/Domain/IntegrationEvents/contracts"
 	"time"
 )
 
@@ -11,6 +11,10 @@ type PaymentCompleted struct {
 	OrderID string
 	Amount  domain.Money
 	Time    time.Time
+}
+
+func (p PaymentCompleted) Name() string {
+	return "PaymentCompleted"
 }
 
 // maps the shared contract to our bounded context's content

@@ -6,5 +6,5 @@ type Event interface {
 
 type Eventbus interface {
 	Publish(event Event) error
-	Subscribe(eventName string, handler func(event Event) error) error
+	Subscribe(event Event, handler func(event Event) error) error
 }

@@ -4,8 +4,10 @@ import (
 	"ecommerce/Auth/routes"
 	api "ecommerce/Order/API"
 	"ecommerce/Order/Domain/services"
-	messaging "ecommerce/Order/Internal/Adapters"
 	config "ecommerce/SharedKernel"
+	"ecommerce/SharedKernel/adapter"
+	"log"
+	"os"
 
 	"github.com/nats-io/nats.go"
 )
@@ -28,9 +30,15 @@ func NewAppInitializer() (*AppInitializer, error) {
 func (ai *AppInitializer) InitializeApp() (*App, error) {
 	app := NewApp(ai.config)
 
-	orderPublisher := messaging.NewNatsOrderAdapter(ai.natsConn)
-	orderService := services.NewOrderService(orderPublisher)
-	orderPublisher.SubscribeToPaymentCompleted(orderService.OnPaymentCompleted) // todo i dont think this is good here (it's trash actually)
+	logger := log.New(os.Stdout, "[APP] ", log.LstdFlags)
+
+	natsEventBus := adapter.NewNatsEventbusAdapter(ai.natsConn, logger)
+
+	orderService, err := services.NewOrderService(natsEventBus, logger)
+	if err != nil {
+		panic("error constructing order service")
+	}
+
 	orderModule := api.NewOrderHandler(orderService)
 
 	authModule := routes.NewAuthHandler()
