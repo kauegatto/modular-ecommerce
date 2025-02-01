@@ -3,8 +3,6 @@ package main
 import (
 	app "ecommerce/App"
 	"log"
-
-	"github.com/nats-io/nats.go"
 )
 
 func main() {
@@ -18,11 +16,9 @@ func main() {
 		log.Fatal("Failed to initialize app:", err)
 	}
 
-	nc, err := nats.Connect(nats.DefaultURL)
 	if err != nil {
 		log.Fatalf("failed to connect to NATS: %v", err)
 	}
-	defer nc.Close()
 
 	if err := app.Start(); err != nil {
 		log.Fatal("Failed to start app:", err)
