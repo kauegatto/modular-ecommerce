@@ -4,7 +4,7 @@ services:
     image: nats
     ports:
       - "8222:8222"
-      - "4222:4222"
+      - "6752:4222"
     command: "--name NATS --cluster nats://0.0.0.0:6222 --http_port 8222 "
     networks: ["nats"]
 networks:

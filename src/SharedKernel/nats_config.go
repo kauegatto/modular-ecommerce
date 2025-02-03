@@ -44,7 +44,7 @@ func LoadConfig() error {
 }
 
 func setDefaults() {
-	viper.SetDefault("url", "nats://localhost:4222")
+	viper.SetDefault("url", "nats://localhost:6752")
 	viper.SetDefault("max_reconnects", 5)
 	viper.SetDefault("reconnect_wait", "2s")
 	viper.SetDefault("connect_timeout", "5s")

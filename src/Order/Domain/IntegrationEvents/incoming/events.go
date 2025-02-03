@@ -1,15 +1,15 @@
 package incoming
 
 import (
-	domain "ecommerce/Order/Domain"
 	"ecommerce/Order/Domain/IntegrationEvents/contracts"
+	"ecommerce/Order/Domain/models"
 	"time"
 )
 
 // this is our domain type
 type PaymentCompleted struct {
 	OrderID string
-	Amount  domain.Money
+	Amount  models.Money
 	Time    time.Time
 }
 
@@ -21,7 +21,7 @@ func (p PaymentCompleted) Name() string {
 func PaymentCompletedFromContract(c contracts.PaymentCompletedV1) PaymentCompleted {
 	return PaymentCompleted{
 		OrderID: c.OrderID,
-		Amount:  domain.Money(c.Amount),
+		Amount:  models.Money(c.Amount),
 		Time:    c.TimeStamp,
 	}
 }
