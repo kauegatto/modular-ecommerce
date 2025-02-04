@@ -3,6 +3,8 @@ package api
 import (
 	"ecommerce/Order/Domain/models"
 	"ecommerce/Order/Domain/services"
+	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -10,18 +12,20 @@ import (
 
 type OrderHandler struct {
 	orderService *services.OrderService
+	log          log.Logger
 }
 
 func NewOrderHandler(orderService *services.OrderService) *OrderHandler {
 	return &OrderHandler{
 		orderService: orderService,
+		log:          *log.Default(),
 	}
 }
 
 func (h *OrderHandler) RegisterRoutes(router *gin.RouterGroup) {
 	router.POST("/place", h.handlePlaceOrder)
-	router.GET("/", h.handleGetOrder)
-	router.POST("/{orderId}/cancel", h.handleCancelOrder)
+	router.GET("/:orderId", h.handleGetOrder)
+	router.POST("/:orderId/cancel", h.handleCancelOrder)
 }
 
 func (h *OrderHandler) Name() string {
@@ -41,15 +45,25 @@ func (h *OrderHandler) handlePlaceOrder(c *gin.Context) {
 		return
 	}
 
-	if err := h.orderService.PlaceOrder(request.CustomerID, request.Items); err != nil {
+	order, err := h.orderService.PlaceOrder(request.CustomerID, request.Items)
+	orderID := order.ID.String()
+
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Order placed successfully",
+	orderURL := fmt.Sprintf("http://%s/api/order/%s", c.Request.Host, orderID)
+
+	log.Printf("Order created: ID=%s, CustomerID=%s", orderID, request.CustomerID)
+
+	c.Header("Location", orderURL)
+	c.JSON(http.StatusCreated, gin.H{
+		"message":  "Order placed successfully",
+		"order_id": orderID,
+		"link":     orderURL,
 	})
 }
 
@@ -88,17 +102,10 @@ func (h *OrderHandler) handleCancelOrder(c *gin.Context) {
 }
 
 func (h *OrderHandler) handleGetOrder(c *gin.Context) {
-	var request struct {
-		OrderId string `json:"order_id"`
-	}
-	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid request",
-		})
-		return
-	}
+	orderIDString := c.Param("orderId")
+	h.log.Printf("Getting order with id %s", orderIDString)
 
-	orderId, err := models.NewOrderID(request.OrderId)
+	orderId, err := models.NewOrderID(orderIDString)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid OrderID: " + err.Error(),
@@ -107,6 +114,7 @@ func (h *OrderHandler) handleGetOrder(c *gin.Context) {
 	}
 
 	order, err := h.orderService.GetOrderById(orderId)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),

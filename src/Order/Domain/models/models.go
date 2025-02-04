@@ -8,12 +8,8 @@ import (
 )
 
 type Money int64
-type OrderID uuid.UUID
+type OrderID = uuid.UUID
 type OrderStatus string
-
-func (o OrderID) String() string {
-	return uuid.UUID(o).String()
-}
 
 func NewOrderID(s string) (OrderID, error) {
 	id, err := uuid.Parse(s)

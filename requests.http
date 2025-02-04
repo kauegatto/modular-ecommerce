@@ -1,8 +1,34 @@
-### Place Order Request
+## Place an Order
 POST http://localhost:8080/api/order/place
 Content-Type: application/json
 
 {
-  "customer_id": "12345",
-  "amount": 100.50
+  "customer_id": "customer123",
+  "items": [
+    {
+      "code": "P001",
+      "name": "Product 1",
+      "unit_price": 10.0,
+      "quantity": 2
+    },
+    {
+      "code": "P002",
+      "name": "Product 2",
+      "unit_price": 15.0,
+      "quantity": 1
+    }
+  ]
 }
+
+### Cancel an Order
+POST http://localhost:8080/api/order/0194ceb2-6f14-716b-aaea-c2371e382663/cancel
+Content-Type: application/json
+
+{
+  "reason": "Customer requested cancellation"
+}
+
+### Get an Order
+GET http://localhost:8080/api/order/0194d35b-f1f9-7121-b8bf-3e317e6f27d2
+
+Content-Type: application/json

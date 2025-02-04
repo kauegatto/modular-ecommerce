@@ -56,10 +56,14 @@ func (s *OrderService) handleOrderCancelled(event sharedKernel.Event) error {
 	return nil
 }
 
-func (s *OrderService) PlaceOrder(customerID string, items []models.OrderItem) error {
+func (s *OrderService) PlaceOrder(customerID string, items []models.OrderItem) (models.Order, error) {
 	order, err := models.NewOrder(customerID, items)
 	if err != nil {
-		return fmt.Errorf("generate order ID: %w", err)
+		return models.Order{}, fmt.Errorf("generate order ID: %w", err)
+	}
+
+	if err := s.orderRepository.Create(*order); err != nil {
+		return models.Order{}, fmt.Errorf("order creation failed %w", err)
 	}
 
 	event := &outgoing.OrderPlaced{
@@ -70,10 +74,10 @@ func (s *OrderService) PlaceOrder(customerID string, items []models.OrderItem) e
 	}
 
 	if err := s.eventBus.Publish(event); err != nil {
-		return fmt.Errorf("publish order placed event: %w", err)
+		return models.Order{}, fmt.Errorf("publish order placed event: %w", err)
 	}
 
-	return nil
+	return *order, nil
 }
 
 func (s *OrderService) CancelOrder(orderID models.OrderID, reason string) error {
@@ -98,7 +102,7 @@ func (s *OrderService) CancelOrder(orderID models.OrderID, reason string) error 
 func (s *OrderService) GetOrderById(orderID models.OrderID) (models.Order, error) {
 	order, err := s.orderRepository.GetOrderById(orderID)
 	if err != nil {
-		return models.Order{}, fmt.Errorf("cancelled order placed event: %w", err)
+		return models.Order{}, fmt.Errorf("Error getting order: %w", err)
 	}
 	return order, nil
 }
