@@ -23,12 +23,12 @@ const (
 )
 
 type Order struct {
-	ID         OrderID     `json:"order_id,omitempty"`
-	customerID string      `json:"customer_id,omitempty"`
-	status     OrderStatus `json:"status,omitempty"`
-	createdAt  time.Time   `json:"created_at,omitempty"`
-	totalPrice float64     `json:"total_price,omitempty"`
-	items      []OrderItem `json:"items,omitempty"`
+	ID         OrderID `json:"order_id,omitempty"`
+	customerID string
+	status     OrderStatus
+	createdAt  time.Time
+	totalPrice float64
+	items      []OrderItem
 }
 
 func (order *Order) AddItems(items []OrderItem) []error {
@@ -70,6 +70,10 @@ func (o *Order) CancelOrder() error {
 	}
 	o.status = OrderStatusCancelled
 	return nil
+}
+
+func (o *Order) TotalPrice() float64 {
+	return o.totalPrice
 }
 
 func NewOrder(customerID string, items []OrderItem) (*Order, error) {

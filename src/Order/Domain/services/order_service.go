@@ -1,23 +1,23 @@
 package services
 
 import (
-	domain "ecommerce/Order/Domain"
 	"ecommerce/Order/Domain/IntegrationEvents/incoming"
 	"ecommerce/Order/Domain/IntegrationEvents/outgoing"
-	"ecommerce/SharedKernel/models"
+	"ecommerce/Order/Domain/models"
+	"ecommerce/Order/Domain/ports"
+	sharedKernel "ecommerce/SharedKernel/models"
 	"fmt"
 	"log"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type OrderService struct {
-	eventBus models.Eventbus
-	logger   *log.Logger
+	eventBus        sharedKernel.Eventbus
+	orderRepository ports.OrderRepository
+	logger          *log.Logger
 }
 
-func NewOrderService(eventBus models.Eventbus, logger *log.Logger) (*OrderService, error) {
+func NewOrderService(eventBus sharedKernel.Eventbus, logger *log.Logger) (*OrderService, error) {
 	service := &OrderService{
 		eventBus: eventBus,
 		logger:   logger,
@@ -36,7 +36,7 @@ func (s *OrderService) subscribeToEvents() error {
 	return nil
 }
 
-func (s *OrderService) handlePaymentCompleted(event models.Event) error {
+func (s *OrderService) handlePaymentCompleted(event sharedKernel.Event) error {
 	payment, ok := event.(*incoming.PaymentCompleted)
 	if !ok {
 		return fmt.Errorf("expected PaymentCompleted, got %T", event)
@@ -45,7 +45,7 @@ func (s *OrderService) handlePaymentCompleted(event models.Event) error {
 	return nil
 }
 
-func (s *OrderService) handleOrderCancelled(event models.Event) error {
+func (s *OrderService) handleOrderCancelled(event sharedKernel.Event) error {
 	orderCancelled, ok := event.(*outgoing.OrderCancelled)
 	if !ok {
 		return fmt.Errorf("expected PaymentCompleted, got %T", event)
@@ -55,16 +55,16 @@ func (s *OrderService) handleOrderCancelled(event models.Event) error {
 	return nil
 }
 
-func (s *OrderService) PlaceOrder(customerID string, amount domain.Money) error {
-	orderID, err := uuid.NewV7()
+func (s *OrderService) PlaceOrder(customerID string, items []models.OrderItem) error {
+	order, err := models.NewOrder(customerID, items)
 	if err != nil {
 		return fmt.Errorf("generate order ID: %w", err)
 	}
 
 	event := &outgoing.OrderPlaced{
-		OrderID:    orderID.String(),
+		OrderID:    order.ID.String(),
 		CustomerID: customerID,
-		Amount:     float64(amount),
+		Amount:     float64(order.TotalPrice()),
 		CreatedAt:  time.Now(),
 	}
 
@@ -72,23 +72,21 @@ func (s *OrderService) PlaceOrder(customerID string, amount domain.Money) error 
 		return fmt.Errorf("publish order placed event: %w", err)
 	}
 
-	cancelledEvent := &outgoing.OrderCancelled{
-		OrderID:     orderID.String(),
-		CancelledAt: time.Now(),
-		Reason:      "Test",
-	}
-
-	if err := s.eventBus.Publish(cancelledEvent); err != nil {
-		return fmt.Errorf("cancelled order placed event: %w", err)
-	}
 	return nil
 }
 
-func (s *OrderService) CancelOrder(orderID domain.OrderID, reasib string) error {
+func (s *OrderService) CancelOrder(orderID models.OrderID, reason string) error {
+	order, err := s.orderRepository.GetOrderById(orderID)
+	if err != nil {
+		return fmt.Errorf("cancelled order placed event: %w", err)
+	}
+	order.CancelOrder()
+	s.orderRepository.PutItem(order)
+
 	cancelledEvent := &outgoing.OrderCancelled{
 		OrderID:     orderID.String(),
 		CancelledAt: time.Now(),
-		Reason:      "Test",
+		Reason:      reason,
 	}
 
 	if err := s.eventBus.Publish(cancelledEvent); err != nil {
