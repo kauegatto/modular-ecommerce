@@ -76,7 +76,7 @@ func (s *OrderService) PlaceOrder(customerID string, items []models.OrderItem) e
 }
 
 func (s *OrderService) CancelOrder(orderID models.OrderID, reason string) error {
-	order, err := s.orderRepository.GetOrderById(orderID)
+	order, err := s.GetOrderById(orderID)
 	if err != nil {
 		return fmt.Errorf("cancelled order placed event: %w", err)
 	}
@@ -93,4 +93,11 @@ func (s *OrderService) CancelOrder(orderID models.OrderID, reason string) error 
 		return fmt.Errorf("cancelled order placed event: %w", err)
 	}
 	return nil
+}
+func (s *OrderService) GetOrderById(orderID models.OrderID) (models.Order, error) {
+	order, err := s.orderRepository.GetOrderById(orderID)
+	if err != nil {
+		return models.Order{}, fmt.Errorf("cancelled order placed event: %w", err)
+	}
+	return order, nil
 }

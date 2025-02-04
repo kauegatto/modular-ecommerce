@@ -15,6 +15,14 @@ func (o OrderID) String() string {
 	return uuid.UUID(o).String()
 }
 
+func NewOrderID(s string) (OrderID, error) {
+	id, err := uuid.Parse(s)
+	if err != nil {
+		return OrderID{}, err
+	}
+	return OrderID(id), nil
+}
+
 const (
 	OrderStatusPlaced    OrderStatus = "ORDER_PLACED"
 	OrderStatusPending   OrderStatus = "ORDER_PENDING"
