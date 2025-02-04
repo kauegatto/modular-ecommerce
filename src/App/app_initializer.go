@@ -4,6 +4,7 @@ import (
 	"ecommerce/Auth/routes"
 	api "ecommerce/Order/API"
 	"ecommerce/Order/Domain/services"
+	"ecommerce/Order/Internal/adapters"
 	config "ecommerce/SharedKernel"
 	"ecommerce/SharedKernel/adapter"
 	"log"
@@ -33,8 +34,8 @@ func (ai *AppInitializer) InitializeApp() (*App, error) {
 	logger := log.New(os.Stdout, "[APP] ", log.LstdFlags)
 
 	natsEventBus := adapter.NewNatsEventbusAdapter(ai.natsConn)
-
-	orderService, err := services.NewOrderService(natsEventBus, logger)
+	inMemOrderRepository := adapters.NewInMemoryOrderRepository()
+	orderService, err := services.NewOrderService(natsEventBus, inMemOrderRepository, logger)
 	if err != nil {
 		panic("error constructing order service")
 	}

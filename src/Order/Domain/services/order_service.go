@@ -17,10 +17,11 @@ type OrderService struct {
 	logger          *log.Logger
 }
 
-func NewOrderService(eventBus sharedKernel.Eventbus, logger *log.Logger) (*OrderService, error) {
+func NewOrderService(eventBus sharedKernel.Eventbus, orderRepository ports.OrderRepository, logger *log.Logger) (*OrderService, error) {
 	service := &OrderService{
-		eventBus: eventBus,
-		logger:   logger,
+		eventBus:        eventBus,
+		orderRepository: orderRepository,
+		logger:          logger,
 	}
 
 	if err := service.subscribeToEvents(); err != nil {
