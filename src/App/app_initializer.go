@@ -1,9 +1,7 @@
 package app
 
 import (
-	"ecommerce/Auth/routes"
-	api "ecommerce/Order/API"
-	"ecommerce/Order/Domain/services"
+	application "ecommerce/Order/Application"
 	"ecommerce/Order/Internal/adapters"
 	config "ecommerce/SharedKernel"
 	"ecommerce/SharedKernel/adapter"
@@ -33,19 +31,21 @@ func (ai *AppInitializer) InitializeApp() (*App, error) {
 
 	logger := log.New(os.Stdout, "[APP] ", log.LstdFlags)
 
+	orderModule := getOrderModule(ai, logger)
+
+	app.RegisterModule(orderModule)
+
+	return app, nil
+}
+
+func getOrderModule(ai *AppInitializer, logger *log.Logger) *application.OrderHandler {
 	natsEventBus := adapter.NewNatsEventbusAdapter(ai.natsConn)
 	inMemOrderRepository := adapters.NewInMemoryOrderRepository()
-	orderService, err := services.NewOrderService(natsEventBus, inMemOrderRepository, logger)
+	orderService, err := application.NewOrderService(natsEventBus, inMemOrderRepository, logger)
 	if err != nil {
 		panic("error constructing order service")
 	}
 
-	orderModule := api.NewOrderHandler(orderService)
-
-	authModule := routes.NewAuthHandler()
-
-	app.RegisterModule(authModule)
-	app.RegisterModule(orderModule)
-
-	return app, nil
+	orderModule := application.NewOrderHandler(orderService)
+	return orderModule
 }

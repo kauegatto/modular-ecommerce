@@ -1,23 +1,23 @@
-package services
+package application
 
 import (
-	"ecommerce/Order/Domain/IntegrationEvents/incoming"
-	"ecommerce/Order/Domain/IntegrationEvents/outgoing"
+	"ecommerce/Order/Application/IntegrationEvents/incoming"
+	"ecommerce/Order/Application/IntegrationEvents/outgoing"
 	"ecommerce/Order/Domain/models"
 	"ecommerce/Order/Domain/ports"
-	sharedKernel "ecommerce/SharedKernel/models"
+	"ecommerce/SharedKernel/eventBus"
 	"fmt"
 	"log"
 	"time"
 )
 
 type OrderService struct {
-	eventBus        sharedKernel.Eventbus
+	eventBus        eventBus.Eventbus
 	orderRepository ports.OrderRepository
 	logger          *log.Logger
 }
 
-func NewOrderService(eventBus sharedKernel.Eventbus, orderRepository ports.OrderRepository, logger *log.Logger) (*OrderService, error) {
+func NewOrderService(eventBus eventBus.Eventbus, orderRepository ports.OrderRepository, logger *log.Logger) (*OrderService, error) {
 	service := &OrderService{
 		eventBus:        eventBus,
 		orderRepository: orderRepository,
@@ -37,7 +37,7 @@ func (s *OrderService) subscribeToEvents() error {
 	return nil
 }
 
-func (s *OrderService) handlePaymentCompleted(event sharedKernel.Event) error {
+func (s *OrderService) handlePaymentCompleted(event eventBus.Event) error {
 	payment, ok := event.(*incoming.PaymentCompleted)
 	if !ok {
 		return fmt.Errorf("expected PaymentCompleted, got %T", event)
@@ -46,7 +46,7 @@ func (s *OrderService) handlePaymentCompleted(event sharedKernel.Event) error {
 	return nil
 }
 
-func (s *OrderService) handleOrderCancelled(event sharedKernel.Event) error {
+func (s *OrderService) handleOrderCancelled(event eventBus.Event) error {
 	orderCancelled, ok := event.(*outgoing.OrderCancelled)
 	if !ok {
 		return fmt.Errorf("expected PaymentCompleted, got %T", event)
@@ -102,7 +102,7 @@ func (s *OrderService) CancelOrder(orderID models.OrderID, reason string) error 
 func (s *OrderService) GetOrderById(orderID models.OrderID) (models.Order, error) {
 	order, err := s.orderRepository.GetOrderById(orderID)
 	if err != nil {
-		return models.Order{}, fmt.Errorf("Error getting order: %w", err)
+		return models.Order{}, fmt.Errorf("error getting order: %w", err)
 	}
 	return order, nil
 }

@@ -1,36 +1,13 @@
-package api
+package application
 
 import (
 	"ecommerce/Order/Domain/models"
-	"ecommerce/Order/Domain/services"
 	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
-
-type OrderHandler struct {
-	orderService *services.OrderService
-	log          log.Logger
-}
-
-func NewOrderHandler(orderService *services.OrderService) *OrderHandler {
-	return &OrderHandler{
-		orderService: orderService,
-		log:          *log.Default(),
-	}
-}
-
-func (h *OrderHandler) RegisterRoutes(router *gin.RouterGroup) {
-	router.POST("/place", h.handlePlaceOrder)
-	router.GET("/:orderId", h.handleGetOrder)
-	router.POST("/:orderId/cancel", h.handleCancelOrder)
-}
-
-func (h *OrderHandler) Name() string {
-	return "order"
-}
 
 func (h *OrderHandler) handlePlaceOrder(c *gin.Context) {
 	var request struct {

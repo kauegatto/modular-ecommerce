@@ -1,4 +1,4 @@
-package models
+package eventBus
 
 type Event interface {
 	Name() string

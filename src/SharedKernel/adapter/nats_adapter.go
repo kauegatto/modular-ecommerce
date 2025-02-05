@@ -1,7 +1,7 @@
 package adapter
 
 import (
-	"ecommerce/SharedKernel/models"
+	"ecommerce/SharedKernel/eventBus"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -12,18 +12,18 @@ import (
 
 type NatsEventbusAdapter struct {
 	nc       *nats.Conn
-	handlers map[string][]func(models.Event) error
+	handlers map[string][]func(eventBus.Event) error
 	mu       sync.RWMutex
 }
 
 func NewNatsEventbusAdapter(nc *nats.Conn) *NatsEventbusAdapter {
 	return &NatsEventbusAdapter{
 		nc:       nc,
-		handlers: make(map[string][]func(models.Event) error),
+		handlers: make(map[string][]func(eventBus.Event) error),
 	}
 }
 
-func (n *NatsEventbusAdapter) Publish(event models.Event) error {
+func (n *NatsEventbusAdapter) Publish(event eventBus.Event) error {
 	log := log.Default()
 	data, err := json.Marshal(event)
 	if err != nil {
@@ -39,13 +39,13 @@ func (n *NatsEventbusAdapter) Publish(event models.Event) error {
 	return nil
 }
 
-func (n *NatsEventbusAdapter) Subscribe(event models.Event, handler func(event models.Event) error) error {
+func (n *NatsEventbusAdapter) Subscribe(event eventBus.Event, handler func(event eventBus.Event) error) error {
 
 	n.subscribeOnNats(event, handler)
 	return nil
 }
 
-func (n *NatsEventbusAdapter) subscribeOnNats(event models.Event, handler func(event models.Event) error) error {
+func (n *NatsEventbusAdapter) subscribeOnNats(event eventBus.Event, handler func(event eventBus.Event) error) error {
 	n.mu.Lock()
 	n.handlers[event.Name()] = append(n.handlers[event.Name()], handler)
 	n.mu.Unlock()
@@ -63,7 +63,7 @@ func (n *NatsEventbusAdapter) subscribeOnNats(event models.Event, handler func(e
 			n.mu.RUnlock()
 
 			for _, h := range handlers {
-				go func(handlerFunc func(models.Event) error) {
+				go func(handlerFunc func(eventBus.Event) error) {
 					if err := handlerFunc(newEvent); err != nil {
 						log.Printf("Handler failed for event %s: %v", event.Name(), err)
 					}
