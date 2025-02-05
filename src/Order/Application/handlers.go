@@ -1,6 +1,7 @@
 package application
 
 import (
+	dto "ecommerce/Order/Application/Dto"
 	"ecommerce/Order/Domain/models"
 	"fmt"
 	"log"
@@ -91,7 +92,7 @@ func (h *OrderHandler) handleGetOrder(c *gin.Context) {
 	}
 
 	order, err := h.orderService.GetOrderById(orderId)
-
+	orderDto := dto.ToOrderDto(&order)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -100,6 +101,6 @@ func (h *OrderHandler) handleGetOrder(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"Order": order,
+		"Order": orderDto,
 	})
 }

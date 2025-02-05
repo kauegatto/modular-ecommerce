@@ -28,7 +28,7 @@ const (
 
 type Order struct {
 	ID         OrderID `json:"order_id,omitempty"`
-	customerID string
+	CustomerID string
 	status     OrderStatus
 	createdAt  time.Time
 	totalPrice float64
@@ -41,14 +41,13 @@ func (order *Order) AddItems(items []OrderItem) []error {
 		if err := order.AddItem(item); err != nil {
 			errors = append(errors, err)
 		}
-		order.items = append(order.items, item)
 	}
 	return errors
 }
 
 func (order *Order) AddItem(item OrderItem) error {
 	order.items = append(order.items, item)
-	order.totalPrice = item.UnitPrice + order.totalPrice
+	order.totalPrice += item.UnitPrice * float64(item.Quantity)
 	return nil
 }
 
@@ -80,11 +79,27 @@ func (o *Order) TotalPrice() float64 {
 	return o.totalPrice
 }
 
+func (o *Order) Status() OrderStatus {
+	return o.status
+}
+
+func (o *Order) CreatedAt() time.Time {
+	return o.createdAt
+}
+
+func (o *Order) Items() []OrderItem {
+	return o.items
+}
+
 func NewOrder(customerID string, items []OrderItem) (*Order, error) {
+	if len(customerID) < 4 {
+		return &Order{}, fmt.Errorf("invalid customerId: %s", customerID)
+	}
+
 	id, _ := uuid.NewV7()
 	order := &Order{
 		ID:         OrderID(id),
-		customerID: customerID,
+		CustomerID: customerID,
 		status:     OrderStatusPlaced,
 		createdAt:  time.Now().UTC(),
 		totalPrice: 0,

@@ -1,9 +1,14 @@
+@orderId=0194d374-9479-7c00-9792-7c2bc38b6a60
+@hostName=http://localhost:8080
+
 ## Place an Order
-POST http://localhost:8080/api/order/place
+# @name placeOrder
+# @prompt customer_id Seu id de usuário
+POST {{hostName}}/api/order/place
 Content-Type: application/json
 
 {
-  "customer_id": "customer123",
+  "customer_id": "{{customer_id}}",
   "items": [
     {
       "code": "P001",
@@ -20,15 +25,15 @@ Content-Type: application/json
   ]
 }
 
+### Get an Order
+GET {{hostName}}/api/order/{{placeOrder.response.body.order_id}}
+
+Content-Type: application/json
+
 ### Cancel an Order
-POST http://localhost:8080/api/order/0194ceb2-6f14-716b-aaea-c2371e382663/cancel
+POST {{hostName}}/api/order/{{placeOrder.response.body.order_id}}/cancel
 Content-Type: application/json
 
 {
   "reason": "Customer requested cancellation"
 }
-
-### Get an Order
-GET http://localhost:8080/api/order/0194d35b-f1f9-7121-b8bf-3e317e6f27d2
-
-Content-Type: application/json
