@@ -4,6 +4,7 @@ import (
 	"context"
 	"ecommerce/Order/Domain/models"
 	"ecommerce/Order/Infrastructure/store"
+	"log/slog"
 	"math/big"
 	"time"
 
@@ -35,8 +36,10 @@ func (repo PostgresRepository) Create(ctx context.Context, order *models.Order) 
 
 	_, err := repo.queries.CreateOrder(ctx, params)
 	if err != nil {
+		slog.ErrorContext(ctx, "Order when inserting order on db %w", err)
 		return err
 	}
+	slog.InfoContext(ctx, "Order inserted on db with success %w", order)
 	return nil
 }
 
@@ -50,16 +53,20 @@ func (repo PostgresRepository) Update(ctx context.Context, order *models.Order) 
 
 	err := repo.queries.UpdateOrder(ctx, params)
 	if err != nil {
+		slog.ErrorContext(ctx, "Order when updating order on db %w", err)
 		return err
 	}
+	slog.InfoContext(ctx, "Order updated on db with success %w", order)
 	return nil
 }
 
 func (repo PostgresRepository) GetOrderById(ctx context.Context, id models.OrderID) (*models.Order, error) {
 	dbOrder, err := repo.queries.GetOrder(ctx, id)
 	if err != nil {
+		slog.ErrorContext(ctx, "Could not find order", slog.Attr{Key: "OrderId", Value: slog.StringValue(id.String())})
 		return &models.Order{}, err
 	}
+
 	order := models.NewOrderFromDTO(
 		dbOrder.ID,
 		dbOrder.CustomerID,
@@ -70,5 +77,6 @@ func (repo PostgresRepository) GetOrderById(ctx context.Context, id models.Order
 		[]models.OrderItem{},              // todo
 	)
 
+	slog.InfoContext(ctx, "Order found %w", order)
 	return order, nil
 }
