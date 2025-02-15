@@ -20,7 +20,7 @@ CREATE TABLE items (
 
 CREATE TABLE orders (
     id UUID PRIMARY KEY,
-    customer_id UUID NOT NULL,
+    customer_id string NOT NULL,
     status_id INT NOT NULL,
     created_at TIMESTAMP NOT NULL,
     total_price BIGINT NOT NULL,

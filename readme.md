@@ -1,4 +1,5 @@
 # Todos
+
 * [X] Integration Events rename
 * [-] Use natsConfig
 * [ ] Jetstream
@@ -7,3 +8,4 @@
 * [ ] Separar melhor o mapping de tipos internos para tipos externos de IntegrationEvents
 * [X] Inicialização do módulo melhorada, principalmente dos subscribers
 * [ ] Add otel & logging
+* [x] Introduce sqlc

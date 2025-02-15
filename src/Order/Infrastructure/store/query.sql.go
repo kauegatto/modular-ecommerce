@@ -18,7 +18,7 @@ INSERT INTO orders (id, customer_id, status_id, created_at, total_price, discoun
 
 type CreateOrderParams struct {
 	ID         uuid.UUID
-	CustomerID uuid.UUID
+	CustomerID string
 	StatusID   int32
 	CreatedAt  pgtype.Timestamp
 	TotalPrice int64
@@ -83,7 +83,7 @@ WHERE o.id = $1
 
 type GetOrderWithItemsRow struct {
 	ID         uuid.UUID
-	CustomerID uuid.UUID
+	CustomerID string
 	StatusID   int32
 	CreatedAt  pgtype.Timestamp
 	TotalPrice int64

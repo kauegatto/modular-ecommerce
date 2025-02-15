@@ -17,7 +17,7 @@ type Item struct {
 
 type Order struct {
 	ID         uuid.UUID
-	CustomerID uuid.UUID
+	CustomerID string
 	StatusID   int32
 	CreatedAt  pgtype.Timestamp
 	TotalPrice int64

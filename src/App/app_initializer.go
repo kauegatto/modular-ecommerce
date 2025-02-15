@@ -30,7 +30,6 @@ func NewAppInitializer() (*AppInitializer, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to postgres with string %s", config.C.DatabaseConfig.ConnectionString())
 	}
-
 	return &AppInitializer{config: config.C, natsConn: nc, dbPool: dbPool}, nil
 }
 
