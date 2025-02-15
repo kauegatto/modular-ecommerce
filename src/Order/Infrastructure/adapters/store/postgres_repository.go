@@ -24,11 +24,9 @@ func NewOrderPostgresRepository(db *pgxpool.Pool) PostgresRepository {
 }
 
 func (repo PostgresRepository) Create(ctx context.Context, order *models.Order) error {
-	customerUUID := order.CustomerID
-
 	params := store.CreateOrderParams{
 		ID:         order.ID,
-		CustomerID: customerUUID,
+		CustomerID: order.CustomerID,
 		StatusID:   1,
 		CreatedAt:  pgtype.Timestamp{Time: time.Now(), Valid: true},
 		TotalPrice: int64(order.TotalPrice()),
