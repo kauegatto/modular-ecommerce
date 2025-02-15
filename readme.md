@@ -1,19 +1,37 @@
-# Projeto
+# Projeto Ecommerce Modular
 
-## Event Driven - NATS
+* Toda a infraestrutura necessária está contida em um docker-compose:
+  * Nats.io
+  * Postgres
+  * PgAdmin
+* Requisitos:
+  * Docker
+  * SQLc
+  * Goose
+  * Go 1.22+
+  
+## 📭 Event Driven (Com NATS.io)
 
-## Migrations c/ Goose
+[Post no dev.to](https://dev.to/kauegatto/wip-arquiteturas-orientadas-a-eventos-e-monolitos-modulares-3ac2-temp-slug-5623860?preview=5be5a5733061cd124a999f8373fb107687897a9e3b03fb92fc01952737f53d3682f42925b507aa4bb02858c7fc797539b2686e03222e024f271ddb42) sobre arquitetura orientada à eventos, especialmente em sistemas monolíticos modularizados e microserviços:
 
-## Camada de dbmodel com sqlc
+## ⚙️ Camada de DBModel com SQLc
+
+Para agilizar e promover mais segurança no desenvolvimento, optei por utilizar [sqlc](https://docs.sqlc.dev/en/stable/tutorials/getting-started-postgresql.html), ferramenta que gera objetos que serão deserializados e serializados no banco de dados, structs de request/response, abstrações para uso de transações, entre outras coisas, precisamos somente prover o estado do schema e as queries
+
+> verificar `src//Order/query.sql`
 
 
 ## Atualizar camada de infra
 
 ```bash
-    sqlc generate
+sqlc generate
 ```
 
-## Migrations
+## 🪿 Migrations (Com Goose)
+
+Para cuidar do schema do banco de dados, faremos migrações, que gerenciam o estado do nosso banco de dados em diferentes momentos.
+
+Somos capazes de voltar para pontos prefixados do passado, voltar apenas um ou uma quantidade específica de versões, entre outras vantagens como seeding.
 
 ### Integração entre sqlc e migrations
 

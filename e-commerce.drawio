@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="xE1C860Rz4oGugC2tapa" name="Architecture Overview">
-        <mxGraphModel dx="1074" dy="779" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1902" dy="885" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -101,7 +101,7 @@
         </mxGraphModel>
     </diagram>
     <diagram id="KAdzTB_DEehnYHPMhaGk" name="Order">
-        <mxGraphModel dx="1074" dy="779" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1342" dy="625" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -229,7 +229,7 @@
         </mxGraphModel>
     </diagram>
     <diagram name="Copy of Order" id="x1vPUKLpuUCheEow0_rX">
-        <mxGraphModel dx="1103" dy="779" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1342" dy="625" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="65udlxbwhHrKZSYzAluk-0"/>
                 <mxCell id="65udlxbwhHrKZSYzAluk-1" parent="65udlxbwhHrKZSYzAluk-0"/>
@@ -257,14 +257,6 @@
                 <mxCell id="cf1oUK08KHIq11pFxMvD-0" value="Dados de pagamento vem de uma api dentro do bounded contexts de pagamento, que ouvirá webhook do gateway" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#FFFEFE;" parent="65udlxbwhHrKZSYzAluk-1" vertex="1">
                     <mxGeometry x="110" y="620" width="640" height="30" as="geometry"/>
                 </mxCell>
-            </root>
-        </mxGraphModel>
-    </diagram>
-    <diagram id="OqBpoMWBN4ipn6h9ffNi" name="Page-4">
-        <mxGraphModel dx="968" dy="779" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
-            <root>
-                <mxCell id="0"/>
-                <mxCell id="1" parent="0"/>
             </root>
         </mxGraphModel>
     </diagram>
