@@ -32,6 +32,7 @@ type Order struct {
 	status     OrderStatus
 	createdAt  time.Time
 	totalPrice float64
+	discount   int
 	items      []OrderItem
 }
 
@@ -87,6 +88,10 @@ func (o *Order) CreatedAt() time.Time {
 	return o.createdAt
 }
 
+func (o *Order) Discount() int {
+	return o.discount
+}
+
 func (o *Order) Items() []OrderItem {
 	return o.items
 }
@@ -103,6 +108,7 @@ func NewOrder(customerID string, items []OrderItem) (*Order, error) {
 		status:     OrderStatusPlaced,
 		createdAt:  time.Now().UTC(),
 		totalPrice: 0,
+		discount:   0,
 		items:      []OrderItem{},
 	}
 
@@ -111,6 +117,26 @@ func NewOrder(customerID string, items []OrderItem) (*Order, error) {
 	}
 
 	return order, nil
+}
+
+func NewOrderFromDTO(
+	ID OrderID,
+	CustomerID string,
+	status OrderStatus,
+	createdAt time.Time,
+	totalPrice float64,
+	discount int,
+	items []OrderItem,
+) *Order {
+	return &Order{
+		ID:         ID,
+		CustomerID: CustomerID,
+		status:     status,
+		createdAt:  createdAt,
+		totalPrice: totalPrice,
+		discount:   discount,
+		items:      items,
+	}
 }
 
 type OrderItem struct {

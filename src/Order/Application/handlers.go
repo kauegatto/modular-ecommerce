@@ -23,7 +23,7 @@ func (h *OrderHandler) handlePlaceOrder(c *gin.Context) {
 		return
 	}
 
-	order, err := h.orderService.PlaceOrder(request.CustomerID, request.Items)
+	order, err := h.orderService.PlaceOrder(c, request.CustomerID, request.Items)
 	orderID := order.ID.String()
 
 	if err != nil {
@@ -67,7 +67,7 @@ func (h *OrderHandler) handleCancelOrder(c *gin.Context) {
 		return
 	}
 
-	if err := h.orderService.CancelOrder(orderId, request.Reason); err != nil {
+	if err := h.orderService.CancelOrder(c, orderId, request.Reason); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -91,7 +91,7 @@ func (h *OrderHandler) handleGetOrder(c *gin.Context) {
 		return
 	}
 
-	order, err := h.orderService.GetOrderById(orderId)
+	order, err := h.orderService.GetOrderById(c, orderId)
 	orderDto := dto.ToOrderDto(&order)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{

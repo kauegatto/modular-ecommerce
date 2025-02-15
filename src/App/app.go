@@ -9,7 +9,7 @@ import (
 type App struct {
 	router  *gin.Engine
 	modules []Module
-	config  *config.NatsConfig
+	config  *config.Configuration
 }
 
 type Module interface {
@@ -17,7 +17,7 @@ type Module interface {
 	Name() string
 }
 
-func NewApp(config *config.NatsConfig) *App {
+func NewApp(config *config.Configuration) *App {
 	router := gin.Default()
 	return &App{
 		router:  router,

@@ -1,0 +1,16 @@
+nats:
+  url: "nats://localhost:6752"
+  max_reconnects: 5
+  reconnect_wait: "2s"
+  connect_timeout: "5s"
+  user_credentials: ""
+  max_pending_bytes: 67108864
+  max_pending_msgs: 65536
+
+database:
+  host: "localhost"
+  port: 5432
+  user: "postgres"
+  password: ""
+  dbname: "app_db"
+  sslmode: "disable"

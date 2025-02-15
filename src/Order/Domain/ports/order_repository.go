@@ -1,9 +1,12 @@
 package ports
 
-import "ecommerce/Order/Domain/models"
+import (
+	"context"
+	"ecommerce/Order/Domain/models"
+)
 
 type OrderRepository interface {
-	GetOrderById(id models.OrderID) (models.Order, error)
-	Create(order models.Order) error
-	PutItem(order models.Order) error
+	GetOrderById(ctx context.Context, id models.OrderID) (*models.Order, error)
+	Create(ctx context.Context, order *models.Order) error
+	Update(ctx context.Context, order *models.Order) error
 }

@@ -1,6 +1,7 @@
 package application
 
 import (
+	"context"
 	"ecommerce/Order/Application/IntegrationEvents/incoming"
 	"ecommerce/Order/Application/IntegrationEvents/outgoing"
 	"ecommerce/Order/Domain/models"
@@ -56,13 +57,13 @@ func (s *OrderService) handleOrderCancelled(event eventBus.Event) error {
 	return nil
 }
 
-func (s *OrderService) PlaceOrder(customerID string, items []models.OrderItem) (models.Order, error) {
+func (s *OrderService) PlaceOrder(ctx context.Context, customerID string, items []models.OrderItem) (models.Order, error) {
 	order, err := models.NewOrder(customerID, items)
 	if err != nil {
 		return models.Order{}, fmt.Errorf("generate order ID: %w", err)
 	}
 
-	if err := s.orderRepository.Create(*order); err != nil {
+	if err := s.orderRepository.Create(ctx, order); err != nil {
 		return models.Order{}, fmt.Errorf("order creation failed %w", err)
 	}
 
@@ -80,13 +81,13 @@ func (s *OrderService) PlaceOrder(customerID string, items []models.OrderItem) (
 	return *order, nil
 }
 
-func (s *OrderService) CancelOrder(orderID models.OrderID, reason string) error {
-	order, err := s.GetOrderById(orderID)
+func (s *OrderService) CancelOrder(ctx context.Context, orderID models.OrderID, reason string) error {
+	order, err := s.GetOrderById(ctx, orderID)
 	if err != nil {
 		return fmt.Errorf("cancelled order placed event: %w", err)
 	}
 	order.CancelOrder()
-	s.orderRepository.PutItem(order)
+	s.orderRepository.Update(ctx, &order)
 
 	cancelledEvent := &outgoing.OrderCancelled{
 		OrderID:     orderID.String(),
@@ -99,10 +100,10 @@ func (s *OrderService) CancelOrder(orderID models.OrderID, reason string) error 
 	}
 	return nil
 }
-func (s *OrderService) GetOrderById(orderID models.OrderID) (models.Order, error) {
-	order, err := s.orderRepository.GetOrderById(orderID)
+func (s *OrderService) GetOrderById(ctx context.Context, orderID models.OrderID) (models.Order, error) {
+	order, err := s.orderRepository.GetOrderById(ctx, orderID)
 	if err != nil {
 		return models.Order{}, fmt.Errorf("error getting order: %w", err)
 	}
-	return order, nil
+	return *order, nil
 }
