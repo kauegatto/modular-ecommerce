@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE Payment(
+CREATE TABLE payments(
     id UUID PRIMARY KEY,
     orderID UUID NOT NULL,
     totalAmount BIGINT NOT NULL,
@@ -11,5 +11,5 @@ CREATE TABLE Payment(
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE Payment
+DROP TABLE payments
 -- +goose StatementEnd

@@ -67,7 +67,7 @@ exemplo:
 ```bash
 ❯ export GOOSE_DRIVER=postgres
 ❯ export GOOSE_DBSTRING="host=localhost port=5432 user=admin@pgadmin.com password=admin dbname=postgres sslmode=disable"
-❯ GOOSE_MIGRATION_DIR=./migrations
+❯ export GOOSE_MIGRATION_DIR=./migrations
 ```
 
 ### Aplicar migrations

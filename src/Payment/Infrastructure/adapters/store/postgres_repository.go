@@ -3,30 +3,71 @@ package adapters
 import (
 	"context"
 	"ecommerce/Payment/Domain/models"
+	"ecommerce/Payment/Infrastructure/store"
 	"fmt"
 
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type PostgresRepository struct {
-	db *pgxpool.Pool
+	db      *pgxpool.Pool
+	queries *store.Queries
 }
 
 func NewPaymentPostgresRepository(db *pgxpool.Pool) PostgresRepository {
 	return PostgresRepository{
-		db: db,
+		db:      db,
+		queries: store.New(db),
 	}
 }
 
 func (repo PostgresRepository) Create(ctx context.Context, Payment *models.Payment) error {
-	return fmt.Errorf("not Implemented")
+	request := store.CreatePaymentParams{
+		ID:                   Payment.ID,
+		Orderid:              Payment.OrderId,
+		Totalamount:          int64(Payment.TotalPrice()),
+		CreatedAt:            pgtype.Timestamp{Time: Payment.CreatedAt()},
+		Integratorexternalid: pgtype.Text{String: Payment.ExternalIntegratorID},
+	}
+	_, err := repo.queries.CreatePayment(ctx, request)
+	if err != nil {
+		return fmt.Errorf("error creating payment %v", err)
+
+	}
+	return nil
 }
 
 func (repo PostgresRepository) Update(ctx context.Context, Payment *models.Payment) error {
-	return fmt.Errorf("not Implemented")
+	request := store.UpdatePaymentParams{
+		ID:                   Payment.ID,
+		Orderid:              Payment.OrderId,
+		Totalamount:          int64(Payment.TotalPrice()),
+		CreatedAt:            pgtype.Timestamp{Time: Payment.CreatedAt()},
+		Integratorexternalid: pgtype.Text{String: Payment.ExternalIntegratorID},
+	}
+	err := repo.queries.UpdatePayment(ctx, request)
+	if err != nil {
+		return fmt.Errorf("error creating payment %v", err)
 
+	}
+	return nil
 }
 
 func (repo PostgresRepository) GetPaymentById(ctx context.Context, id models.PaymentID) (*models.Payment, error) {
-	return &models.Payment{}, fmt.Errorf("not Implemented")
+
+	payment, err := repo.queries.GetPayment(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("error creating payment %v", err)
+
+	}
+	modelPayment := models.NewPaymentFromRehidration(
+		payment.ID,
+		payment.Orderid,
+		payment.Integratorexternalid.String,
+		models.PaymentStatusPending,
+		payment.CreatedAt.Time,
+		models.Money(payment.Totalamount),
+	)
+	return modelPayment, nil
 }

@@ -1,17 +1,18 @@
 package application
 
 import (
+	service "ecommerce/Payment/Application/Service"
 	"log"
 
 	"github.com/gin-gonic/gin"
 )
 
 type PaymentHandler struct {
-	PaymentService *PaymentService
+	PaymentService *service.PaymentService
 	log            log.Logger
 }
 
-func NewPaymentHandler(PaymentService *PaymentService) *PaymentHandler {
+func NewPaymentHandler(PaymentService *service.PaymentService) *PaymentHandler {
 	return &PaymentHandler{
 		PaymentService: PaymentService,
 		log:            *log.Default(),

@@ -81,10 +81,10 @@ func (h *OrderHandler) handleCancelOrder(c *gin.Context) {
 
 func (h *OrderHandler) handleGetOrder(c *gin.Context) {
 	orderIDString := c.Param("orderId")
-	h.log.Printf("Getting order with id %s", orderIDString)
 
 	orderId, err := models.NewOrderID(orderIDString)
 	if err != nil {
+		h.log.Printf("Getting order with id %s %v", orderIDString, err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid OrderID: " + err.Error(),
 		})
