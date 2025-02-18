@@ -2,22 +2,25 @@ package app
 
 import (
 	"context"
-	application "ecommerce/Order/Application"
-	adapters "ecommerce/Order/Infrastructure/adapters/store"
+	orderapplication "ecommerce/Order/Application"
+	orderadapters "ecommerce/Order/Infrastructure/adapters/store"
+	application "ecommerce/Payment/Application/Routing"
+	paymentapplication "ecommerce/Payment/Application/Routing"
+	paymentservice "ecommerce/Payment/Application/Service"
+	paymentadapters "ecommerce/Payment/Infrastructure/adapters/store"
+
 	config "ecommerce/SharedKernel"
 	"ecommerce/SharedKernel/adapter"
 	"fmt"
-	"log"
-	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/nats-io/nats.go"
 )
 
 type AppInitializer struct {
-	dbPool   *pgxpool.Pool
-	config   *config.Configuration
-	natsConn *nats.Conn
+	dbPool       *pgxpool.Pool
+	config       *config.Configuration
+	NatsEventBus *adapter.NatsEventbusAdapter
 }
 
 func NewAppInitializer() (*AppInitializer, error) {
@@ -30,29 +33,39 @@ func NewAppInitializer() (*AppInitializer, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to postgres with string %s", config.C.DatabaseConfig.ConnectionString())
 	}
-	return &AppInitializer{config: config.C, natsConn: nc, dbPool: dbPool}, nil
+
+	eventBus := adapter.NewNatsEventbusAdapter(nc)
+	return &AppInitializer{config: config.C, dbPool: dbPool, NatsEventBus: eventBus}, nil
 }
 
 func (ai *AppInitializer) InitializeApp() (*App, error) {
 	app := NewApp(ai.config)
 
-	logger := log.New(os.Stdout, "[APP] ", log.LstdFlags)
-
-	orderModule := getOrderModule(ai, logger)
+	orderModule := ai.getOrderModule()
+	paymentModule := ai.getPaymentModule()
 
 	app.RegisterModule(orderModule)
+	app.RegisterModule(paymentModule)
 
 	return app, nil
 }
 
-func getOrderModule(ai *AppInitializer, logger *log.Logger) *application.OrderHandler {
-	natsEventBus := adapter.NewNatsEventbusAdapter(ai.natsConn)
-	postgresOrderRepository := adapters.NewOrderPostgresRepository(ai.dbPool)
-	orderService, err := application.NewOrderService(natsEventBus, postgresOrderRepository, logger)
+func (ai *AppInitializer) getOrderModule() *orderapplication.OrderHandler {
+	postgresOrderRepository := orderadapters.NewOrderPostgresRepository(ai.dbPool)
+	orderService, err := orderapplication.NewOrderService(ai.NatsEventBus, postgresOrderRepository)
 	if err != nil {
 		panic("error constructing order service")
 	}
 
-	orderModule := application.NewOrderHandler(orderService)
+	orderModule := orderapplication.NewOrderHandler(orderService)
 	return orderModule
+}
+
+func (ai *AppInitializer) getPaymentModule() *paymentapplication.PaymentHandler {
+	postgresOrderRepository := paymentadapters.NewPaymentPostgresRepository(ai.dbPool)
+	paymentService, err := paymentservice.NewPaymentService(ai.NatsEventBus, postgresOrderRepository)
+	if err != nil {
+		panic("error constructing order service")
+	}
+	return application.NewPaymentHandler(paymentService)
 }
