@@ -58,9 +58,26 @@ func (repo PostgresRepository) GetPaymentById(ctx context.Context, id models.Pay
 
 	payment, err := repo.queries.GetPayment(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("error creating payment %v", err)
+		return nil, fmt.Errorf("error getting payment from db %v", err)
 
 	}
+
+	modelPayment := paymentDbModelToModel(payment)
+	return modelPayment, nil
+}
+
+func (repo PostgresRepository) GetPaymentByOrderId(ctx context.Context, orderId string) (*models.Payment, error) {
+
+	payment, err := repo.queries.GetPaymentByOrderId(ctx, orderId)
+	if err != nil {
+		return nil, fmt.Errorf("error getting payment from db %v", err)
+	}
+
+	modelPayment := paymentDbModelToModel(payment)
+	return modelPayment, nil
+}
+
+func paymentDbModelToModel(payment store.Payment) *models.Payment {
 	modelPayment := models.NewPaymentFromRehidration(
 		payment.ID,
 		payment.Orderid,
@@ -69,5 +86,5 @@ func (repo PostgresRepository) GetPaymentById(ctx context.Context, id models.Pay
 		payment.CreatedAt.Time,
 		models.Money(payment.Totalamount),
 	)
-	return modelPayment, nil
+	return modelPayment
 }

@@ -1,6 +1,9 @@
 -- name: GetPayment :one
 SELECT * FROM payments WHERE id = $1 LIMIT 1;
 
+-- name: GetPaymentByOrderId :one
+SELECT * FROM payments WHERE orderID = $1 LIMIT 1;
+
 -- name: ListPayments :many
 SELECT * FROM payments ORDER BY created_at DESC;
 

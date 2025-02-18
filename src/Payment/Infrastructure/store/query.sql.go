@@ -75,6 +75,23 @@ func (q *Queries) GetPayment(ctx context.Context, id uuid.UUID) (Payment, error)
 	return i, err
 }
 
+const getPaymentByOrderId = `-- name: GetPaymentByOrderId :one
+SELECT id, orderid, totalamount, created_at, integratorexternalid FROM payments WHERE orderID = $1 LIMIT 1
+`
+
+func (q *Queries) GetPaymentByOrderId(ctx context.Context, orderid string) (Payment, error) {
+	row := q.db.QueryRow(ctx, getPaymentByOrderId, orderid)
+	var i Payment
+	err := row.Scan(
+		&i.ID,
+		&i.Orderid,
+		&i.Totalamount,
+		&i.CreatedAt,
+		&i.Integratorexternalid,
+	)
+	return i, err
+}
+
 const listPayments = `-- name: ListPayments :many
 SELECT id, orderid, totalamount, created_at, integratorexternalid FROM payments ORDER BY created_at DESC
 `

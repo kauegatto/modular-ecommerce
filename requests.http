@@ -1,4 +1,5 @@
 @orderId=01950796-e2e7-74c6-bf61-3c2fd91d9e2d
+@paymentId=
 @hostName=http://localhost:8080
 
 ## Place an Order
@@ -37,3 +38,19 @@ Content-Type: application/json
 {
   "reason": "Customer requested cancellation"
 }
+
+### Get an Payment
+GET {{hostName}}/api/payment/{{paymentId}}
+
+Content-Type: application/json
+
+### Get an Payment by OrderId
+GET {{hostName}}/api/payment/{{paymentId}}
+
+Content-Type: application/json
+
+### PostBack - Cancel payment
+POST {{hostName}}/api/order/{{paymentId}}/cancel
+
+### PostBack - Complete payment
+POST {{hostName}}/api/order/{{paymentId}}/complete

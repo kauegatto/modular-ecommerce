@@ -39,12 +39,25 @@ func (s *PaymentService) handleCreatePayment(event eventBus.Event) error {
 	if !ok {
 		return fmt.Errorf("expected PaymentCompleted, got %T", event)
 	}
+
 	payment, err := models.NewPayment(parsedEvent.OrderID, models.Money(parsedEvent.Amount))
 	if err != nil {
 		return fmt.Errorf("handleCreatePayment: error creating payment. Err: %v", err)
 	}
 
-	s.paymentRepository.Create(context.Background(), payment)
+	err = s.paymentRepository.Create(context.Background(), payment)
+	if err != nil {
+		return fmt.Errorf("error creating payment on database %v", err)
+	}
+
+	// should have been done repository + event send transactionally using transactional outbox pattern
+	paymentCancelled := outgoing.PaymentCreated{
+		OrderID:   payment.OrderId,
+		PaymentID: payment.ID,
+		Amount:    string(payment.TotalPrice()),
+		Time:      time.Now(),
+	}
+	s.eventBus.Publish(paymentCancelled)
 	return nil
 }
 
@@ -57,7 +70,11 @@ func (s *PaymentService) ConfirmPayment(ctx context.Context, PaymentID models.Pa
 	if err != nil {
 		return fmt.Errorf("error completing payment %v", err)
 	}
-	s.paymentRepository.Update(ctx, payment)
+
+	err = s.paymentRepository.Update(ctx, payment)
+	if err != nil {
+		return fmt.Errorf("error completing payment on database %v", err)
+	}
 
 	paymentCompleted := outgoing.PaymentCompleted{
 		OrderID:   payment.OrderId,
@@ -78,7 +95,11 @@ func (s *PaymentService) CancelPayment(ctx context.Context, PaymentID models.Pay
 	if err != nil {
 		return fmt.Errorf("error cancelling payment %v", err)
 	}
-	s.paymentRepository.Update(ctx, payment)
+
+	err = s.paymentRepository.Update(ctx, payment)
+	if err != nil {
+		return fmt.Errorf("error cancelling payment on database %v", err)
+	}
 
 	paymentCancelled := outgoing.PaymentCancelled{
 		OrderID:   payment.OrderId,
@@ -91,5 +112,17 @@ func (s *PaymentService) CancelPayment(ctx context.Context, PaymentID models.Pay
 }
 
 func (s *PaymentService) GetPaymentById(ctx context.Context, PaymentID models.PaymentID) (*models.Payment, error) {
-	return &models.Payment{}, fmt.Errorf("not implemented")
+	payment, err := s.paymentRepository.GetPaymentById(ctx, PaymentID)
+	if err != nil {
+		return &models.Payment{}, fmt.Errorf("error finding payment on database %v", err)
+	}
+	return payment, nil
+}
+
+func (s *PaymentService) GetPaymentByOrderId(ctx context.Context, orderId string) (*models.Payment, error) {
+	payment, err := s.paymentRepository.GetPaymentByOrderId(ctx, orderId)
+	if err != nil {
+		return &models.Payment{}, fmt.Errorf("error finding payment on database %v", err)
+	}
+	return payment, nil
 }

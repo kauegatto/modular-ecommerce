@@ -7,6 +7,7 @@ import (
 
 type PaymentRepository interface {
 	GetPaymentById(ctx context.Context, id models.PaymentID) (*models.Payment, error)
+	GetPaymentByOrderId(ctx context.Context, orderId string) (*models.Payment, error)
 	Create(ctx context.Context, Payment *models.Payment) error
 	Update(ctx context.Context, Payment *models.Payment) error
 }
