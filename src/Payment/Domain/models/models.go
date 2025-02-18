@@ -22,45 +22,33 @@ type Payment struct {
 	ID                   PaymentID
 	OrderId              string
 	ExternalIntegratorID string
-	status               PaymentStatus `mapstructure:"status"`
-	createdAt            time.Time     `mapstructure:"createdAt"`
-	totalPrice           Money         `mapstructure:"totalPrice"`
+	Status               PaymentStatus
+	CreatedAt            time.Time
+	TotalPrice           Money
 }
 
 func (p *Payment) CompletePayment() error {
-	if p.status != PaymentStatusPlaced {
-		return fmt.Errorf("cannot complete Payment with status: %s", p.status)
+	if p.Status != PaymentStatusPlaced {
+		return fmt.Errorf("cannot complete Payment with status: %s", p.Status)
 	}
-	p.status = PaymentStatusCompleted
+	p.Status = PaymentStatusCompleted
 	return nil
 }
 
 func (p *Payment) PendingPayment() error {
-	if p.status != PaymentStatusPlaced {
-		return fmt.Errorf("cannot set Payment to pending with status: %s", p.status)
+	if p.Status != PaymentStatusPlaced {
+		return fmt.Errorf("cannot set Payment to pending with status: %s", p.Status)
 	}
-	p.status = PaymentStatusPending
+	p.Status = PaymentStatusPending
 	return nil
 }
 
 func (p *Payment) CancelPayment() error {
-	if p.status == PaymentStatusCancelled {
+	if p.Status == PaymentStatusCancelled {
 		return fmt.Errorf("Payment is already cancelled")
 	}
-	p.status = PaymentStatusCancelled
+	p.Status = PaymentStatusCancelled
 	return nil
-}
-
-func (p *Payment) TotalPrice() Money {
-	return p.totalPrice
-}
-
-func (p *Payment) Status() PaymentStatus {
-	return p.status
-}
-
-func (p *Payment) CreatedAt() time.Time {
-	return p.createdAt
 }
 
 func NewPayment(orderId string, totalAmount Money) (*Payment, error) {
@@ -73,9 +61,9 @@ func NewPayment(orderId string, totalAmount Money) (*Payment, error) {
 		ID:                   id,
 		OrderId:              orderId,
 		ExternalIntegratorID: "",
-		status:               PaymentStatusPlaced,
-		createdAt:            time.Now().UTC(),
-		totalPrice:           totalAmount,
+		Status:               PaymentStatusPlaced,
+		CreatedAt:            time.Now().UTC(),
+		TotalPrice:           totalAmount,
 	}
 	return Payment, nil
 }
@@ -92,8 +80,8 @@ func NewPaymentFromRehidration(
 		ID:                   ID,
 		OrderId:              OrderId,
 		ExternalIntegratorID: ExternalIntegratorID,
-		status:               PaymentStatusPlaced,
-		createdAt:            time.Now().UTC(),
-		totalPrice:           TotalAmount,
+		Status:               PaymentStatusPlaced,
+		CreatedAt:            time.Now().UTC(),
+		TotalPrice:           TotalAmount,
 	}
 }

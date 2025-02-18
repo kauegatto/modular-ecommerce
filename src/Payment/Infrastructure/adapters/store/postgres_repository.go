@@ -26,8 +26,8 @@ func (repo PostgresRepository) Create(ctx context.Context, Payment *models.Payme
 	request := store.CreatePaymentParams{
 		ID:                   Payment.ID,
 		Orderid:              Payment.OrderId,
-		Totalamount:          int64(Payment.TotalPrice()),
-		CreatedAt:            pgtype.Timestamp{Time: Payment.CreatedAt(), Valid: true},
+		Totalamount:          int64(Payment.TotalPrice),
+		CreatedAt:            pgtype.Timestamp{Time: Payment.CreatedAt, Valid: true},
 		Integratorexternalid: pgtype.Text{String: Payment.ExternalIntegratorID, Valid: true},
 	}
 	_, err := repo.queries.CreatePayment(ctx, request)
@@ -42,8 +42,8 @@ func (repo PostgresRepository) Update(ctx context.Context, Payment *models.Payme
 	request := store.UpdatePaymentParams{
 		ID:                   Payment.ID,
 		Orderid:              Payment.OrderId,
-		Totalamount:          int64(Payment.TotalPrice()),
-		CreatedAt:            pgtype.Timestamp{Time: Payment.CreatedAt()},
+		Totalamount:          int64(Payment.TotalPrice),
+		CreatedAt:            pgtype.Timestamp{Time: Payment.CreatedAt},
 		Integratorexternalid: pgtype.Text{String: Payment.ExternalIntegratorID},
 	}
 	err := repo.queries.UpdatePayment(ctx, request)

@@ -54,7 +54,7 @@ func (s *PaymentService) handleCreatePayment(event eventBus.Event) error {
 	paymentCreated := outgoing.PaymentCreated{
 		OrderID:   payment.OrderId,
 		PaymentID: payment.ID,
-		Amount:    string(payment.TotalPrice()),
+		Amount:    string(payment.TotalPrice),
 		Time:      time.Now(),
 	}
 	s.eventBus.Publish(paymentCreated)
@@ -79,7 +79,7 @@ func (s *PaymentService) ConfirmPayment(ctx context.Context, PaymentID models.Pa
 	paymentCompleted := outgoing.PaymentCompleted{
 		OrderID:   payment.OrderId,
 		PaymentID: PaymentID,
-		Amount:    string(payment.TotalPrice()),
+		Amount:    string(payment.TotalPrice),
 		Time:      time.Now(),
 	}
 	s.eventBus.Publish(paymentCompleted)
@@ -104,7 +104,7 @@ func (s *PaymentService) CancelPayment(ctx context.Context, PaymentID models.Pay
 	paymentCancelled := outgoing.PaymentCancelled{
 		OrderID:   payment.OrderId,
 		PaymentID: PaymentID,
-		Amount:    string(payment.TotalPrice()),
+		Amount:    string(payment.TotalPrice),
 		Time:      time.Now(),
 	}
 	s.eventBus.Publish(paymentCancelled)
