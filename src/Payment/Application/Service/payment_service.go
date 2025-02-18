@@ -51,13 +51,13 @@ func (s *PaymentService) handleCreatePayment(event eventBus.Event) error {
 	}
 
 	// should have been done repository + event send transactionally using transactional outbox pattern
-	paymentCancelled := outgoing.PaymentCreated{
+	paymentCreated := outgoing.PaymentCreated{
 		OrderID:   payment.OrderId,
 		PaymentID: payment.ID,
 		Amount:    string(payment.TotalPrice()),
 		Time:      time.Now(),
 	}
-	s.eventBus.Publish(paymentCancelled)
+	s.eventBus.Publish(paymentCreated)
 	return nil
 }
 
