@@ -40,17 +40,13 @@ Content-Type: application/json
 }
 
 ### Get an Payment
-GET {{hostName}}/api/Payment/{{paymentId}}
-
-Content-Type: application/json
+GET {{hostName}}/api/payment/order/{{placeOrder.response.body.order_id}}
 
 ### Get an Payment by PaymentId
 GET {{hostName}}/api/payment/{{paymentId}}
 
-Content-Type: application/json
-
 ### PostBack - Cancel payment
-POST {{hostName}}/api/order/{{paymentId}}/cancel
+POST {{hostName}}/api/payment/{{paymentId}}/cancel
 
 ### PostBack - Complete payment
-POST {{hostName}}/api/order/{{paymentId}}/complete
+POST {{hostName}}/api/payment/{{paymentId}}/complete
