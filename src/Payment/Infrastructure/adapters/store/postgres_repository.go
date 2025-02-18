@@ -27,8 +27,8 @@ func (repo PostgresRepository) Create(ctx context.Context, Payment *models.Payme
 		ID:                   Payment.ID,
 		Orderid:              Payment.OrderId,
 		Totalamount:          int64(Payment.TotalPrice()),
-		CreatedAt:            pgtype.Timestamp{Time: Payment.CreatedAt()},
-		Integratorexternalid: pgtype.Text{String: Payment.ExternalIntegratorID},
+		CreatedAt:            pgtype.Timestamp{Time: Payment.CreatedAt(), Valid: true},
+		Integratorexternalid: pgtype.Text{String: Payment.ExternalIntegratorID, Valid: true},
 	}
 	_, err := repo.queries.CreatePayment(ctx, request)
 	if err != nil {
