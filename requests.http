@@ -1,5 +1,5 @@
 @orderId=01950796-e2e7-74c6-bf61-3c2fd91d9e2d
-@paymentId=
+@paymentId=01951674-0f41-7a01-b931-0fbba0e5cc30
 @hostName=http://localhost:8080
 
 ## Place an Order
@@ -40,11 +40,11 @@ Content-Type: application/json
 }
 
 ### Get an Payment
-GET {{hostName}}/api/payment/{{paymentId}}
+GET {{hostName}}/api/Payment/{{paymentId}}
 
 Content-Type: application/json
 
-### Get an Payment by OrderId
+### Get an Payment by PaymentId
 GET {{hostName}}/api/payment/{{paymentId}}
 
 Content-Type: application/json
