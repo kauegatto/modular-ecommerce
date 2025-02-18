@@ -22,9 +22,9 @@ type Payment struct {
 	ID                   PaymentID
 	OrderId              string
 	ExternalIntegratorID string
-	status               PaymentStatus
-	createdAt            time.Time
-	totalPrice           Money
+	status               PaymentStatus `mapstructure:"status"`
+	createdAt            time.Time     `mapstructure:"createdAt"`
+	totalPrice           Money         `mapstructure:"totalPrice"`
 }
 
 func (p *Payment) CompletePayment() error {
