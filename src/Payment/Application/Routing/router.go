@@ -27,5 +27,5 @@ func (h *PaymentHandler) RegisterRoutes(router *gin.RouterGroup) {
 }
 
 func (h *PaymentHandler) Name() string {
-	return "Payment"
+	return "payment"
 }
