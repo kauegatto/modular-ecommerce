@@ -4,12 +4,14 @@ import (
 	"context"
 	orderapplication "ecommerce/Order/Application"
 	orderadapters "ecommerce/Order/Infrastructure/adapters/store"
-	application "ecommerce/Payment/Application/Routing"
 	paymentapplication "ecommerce/Payment/Application/Routing"
 	paymentservice "ecommerce/Payment/Application/Service"
 	paymentadapters "ecommerce/Payment/Infrastructure/adapters"
+	"time"
 
+	paymentconfig "ecommerce/Payment/Infrastructure"
 	config "ecommerce/SharedKernel"
+
 	"ecommerce/SharedKernel/adapter"
 	"fmt"
 
@@ -62,11 +64,15 @@ func (ai *AppInitializer) getOrderModule() *orderapplication.OrderHandler {
 }
 
 func (ai *AppInitializer) getPaymentModule() *paymentapplication.PaymentHandler {
+	err := paymentconfig.LoadConfig()
+	if err != nil {
+		panic("error constructing payment configurations")
+	}
 	eRedeConfig := paymentadapters.ERedeConfig{
-		PV:      "",
-		Token:   "",
-		BaseURL: "",
-		Timeout: 0,
+		PV:      paymentconfig.C.ERedeConfig.PV,
+		Token:   paymentconfig.C.ERedeConfig.Authorization,
+		BaseURL: paymentconfig.C.ERedeConfig.BaseURL,
+		Timeout: time.Duration(paymentconfig.C.ERedeConfig.Timeout),
 	}
 
 	postgresOrderRepository := paymentadapters.NewPaymentPostgresRepository(ai.dbPool)
@@ -75,5 +81,5 @@ func (ai *AppInitializer) getPaymentModule() *paymentapplication.PaymentHandler 
 	if err != nil {
 		panic("error constructing order service")
 	}
-	return application.NewPaymentHandler(paymentService)
+	return paymentapplication.NewPaymentHandler(paymentService)
 }

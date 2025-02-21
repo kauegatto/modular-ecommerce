@@ -1,0 +1,5 @@
+eRede:
+  pv: 12345678
+  authorization: basic sth
+  baseURL: sandbox.erede.com
+  timeout: 300
