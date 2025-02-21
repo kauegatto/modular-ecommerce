@@ -17,10 +17,11 @@ type PaymentService struct {
 	transactionProcessor ports.TransactionProcessor
 }
 
-func NewPaymentService(eventBus eventBus.Eventbus, paymentRepository ports.PaymentRepository) (*PaymentService, error) {
+func NewPaymentService(eventBus eventBus.Eventbus, paymentRepository ports.PaymentRepository, transactionProcessor ports.TransactionProcessor) (*PaymentService, error) {
 	service := &PaymentService{
-		eventBus:          eventBus,
-		paymentRepository: paymentRepository,
+		eventBus:             eventBus,
+		paymentRepository:    paymentRepository,
+		transactionProcessor: transactionProcessor,
 	}
 
 	if err := service.subscribeToEvents(); err != nil {
