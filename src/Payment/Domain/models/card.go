@@ -10,7 +10,7 @@ import (
 )
 
 type CardNumber struct {
-	Value string
+	value string
 }
 
 func NewCardNumber(pan string) (*CardNumber, error) {
@@ -25,7 +25,7 @@ func NewCardNumber(pan string) (*CardNumber, error) {
 		return nil, errors.New("invalid card number checksum")
 	}
 
-	return &CardNumber{Value: pan}, nil
+	return &CardNumber{value: pan}, nil
 }
 
 func (cn *CardNumber) String() string {
@@ -33,11 +33,11 @@ func (cn *CardNumber) String() string {
 }
 
 func (cn *CardNumber) LastFourDigits() string {
-	return cn.Value[len(cn.Value)-4:]
+	return cn.value[len(cn.value)-4:]
 }
 
 type SecurityCode struct {
-	Value string
+	value string
 }
 
 func (sc *SecurityCode) String() string {
@@ -48,7 +48,7 @@ func NewSecurityCode(code string) (*SecurityCode, error) {
 	if !regexp.MustCompile(`^\d{3,4}$`).MatchString(code) {
 		return nil, errors.New("security code must be 3 or 4 digits")
 	}
-	return &SecurityCode{Value: code}, nil
+	return &SecurityCode{value: code}, nil
 }
 
 type ExpirationDate struct {
@@ -87,7 +87,7 @@ func (ed *ExpirationDate) String() string {
 }
 
 type CardHolderName struct {
-	Value string
+	value string
 }
 
 func NewCardHolderName(name string) (*CardHolderName, error) {
@@ -100,7 +100,7 @@ func NewCardHolderName(name string) (*CardHolderName, error) {
 		return nil, errors.New("cardholder name contains invalid characters")
 	}
 
-	return &CardHolderName{Value: name}, nil
+	return &CardHolderName{value: name}, nil
 }
 
 type Card struct {
@@ -155,10 +155,6 @@ func (c *Card) CardHolderName() *CardHolderName {
 	return c.holderName
 }
 
-func (c *Card) SecurityCode() *SecurityCode {
-	return c.securityCode
-}
-
 func isLuhnValid(pan string) bool {
 	var sum int
 	nDigits := len(pan)
@@ -176,4 +172,22 @@ func isLuhnValid(pan string) bool {
 	}
 
 	return sum%10 == 0
+}
+
+type CardDTO struct {
+	CardHolder      string `json:"cardHolderName"`
+	CardNumber      string `json:"cardNumber"`
+	ExpirationMonth int    `json:"expirationMonth"`
+	ExpirationYear  int    `json:"expirationYear"`
+	SecurityCode    string `json:"securityCode"`
+}
+
+func NewCardDTO(card *Card) CardDTO {
+	return CardDTO{
+		CardHolder:      card.CardHolderName().value,
+		CardNumber:      card.Number().value,
+		ExpirationMonth: card.expiration.month,
+		ExpirationYear:  card.expiration.year,
+		SecurityCode:    card.securityCode.value,
+	}
 }

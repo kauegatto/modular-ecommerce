@@ -67,16 +67,19 @@ func (p *ERedeProcessor) Capture(ctx context.Context, card *models.Card, payment
 	} else {
 		kind = "debit"
 	}
+
+	cardDTO := models.NewCardDTO(card)
+
 	request := eRedeRequest{
 		Capture:         true,
 		Kind:            kind,
 		Reference:       payment.OrderId,
 		Amount:          int(payment.TotalPrice), // Assuming Money is in cents
-		CardHolder:      card.CardHolderName().Value,
-		CardNumber:      card.Number().Value,
+		CardHolder:      cardDTO.CardHolder,
+		CardNumber:      cardDTO.CardNumber,
 		ExpirationMonth: expMonth,
 		ExpirationYear:  expYear,
-		SecurityCode:    card.SecurityCode().Value,
+		SecurityCode:    cardDTO.SecurityCode,
 		SoftDescriptor:  "MYSTORE",
 	}
 
