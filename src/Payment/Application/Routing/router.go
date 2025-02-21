@@ -22,6 +22,8 @@ func NewPaymentHandler(PaymentService *service.PaymentService) *PaymentHandler {
 func (h *PaymentHandler) RegisterRoutes(router *gin.RouterGroup) {
 	router.GET("/order/:orderId", h.handleGetPaymentByOrderId)
 	router.GET("/:paymentId", h.handleGetPayment)
+
+	router.POST("/:paymentId/capture", h.handleCapturePayment)
 	router.POST("/:paymentId/complete", h.handleCompletePayment)
 	router.POST("/:paymentId/cancel", h.handleCancelPayment)
 }

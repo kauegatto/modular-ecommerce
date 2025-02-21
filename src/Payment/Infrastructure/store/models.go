@@ -15,4 +15,16 @@ type Payment struct {
 	Totalamount          int64
 	CreatedAt            pgtype.Timestamp
 	Integratorexternalid pgtype.Text
+	StatusID             int32
+	KindID               int32
+}
+
+type PaymentKind struct {
+	ID   int32
+	Name string
+}
+
+type PaymentStatus struct {
+	ID   int32
+	Name string
 }

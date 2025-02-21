@@ -40,6 +40,21 @@ func (h *PaymentHandler) handleGetPayment(c *gin.Context) {
 	})
 }
 
+func (h *PaymentHandler) handleCapturePayment(c *gin.Context) {
+	paymentId := parseToDomainIdAndReturnIfInvalid(c)
+
+	if err := h.PaymentService.ConfirmPayment(c, paymentId); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Payment completed successfully",
+	})
+}
+
 func (h *PaymentHandler) handleCompletePayment(c *gin.Context) {
 	paymentId := parseToDomainIdAndReturnIfInvalid(c)
 

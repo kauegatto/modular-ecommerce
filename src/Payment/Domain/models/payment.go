@@ -10,18 +10,22 @@ import (
 type Money int64
 type PaymentID = uuid.UUID
 type PaymentStatus string
+type PaymentKind string
 
 const (
 	PaymentStatusPlaced    PaymentStatus = "PAYMENT_CREATED"
 	PaymentStatusPending   PaymentStatus = "PAYMENT_PENDING_PAYMENT"
 	PaymentStatusCompleted PaymentStatus = "PAYMENT_COMPLETED"
 	PaymentStatusCancelled PaymentStatus = "PAYMENT_CANCELLED"
+	PaymentKindDebit       PaymentKind   = "DEBIT"
+	PaymentKindCredit      PaymentKind   = "CREDIT"
 )
 
 type Payment struct {
 	ID                   PaymentID
 	OrderId              string
 	ExternalIntegratorID string
+	Kind                 PaymentKind
 	Status               PaymentStatus
 	CreatedAt            time.Time
 	TotalPrice           Money
@@ -75,12 +79,14 @@ func NewPaymentFromRehidration(
 	status PaymentStatus,
 	createdAt time.Time,
 	TotalAmount Money,
+	kind PaymentKind,
 ) *Payment {
 	return &Payment{
 		ID:                   ID,
 		OrderId:              OrderId,
 		ExternalIntegratorID: ExternalIntegratorID,
-		Status:               PaymentStatusPlaced,
+		Status:               status,
+		Kind:                 kind,
 		CreatedAt:            time.Now().UTC(),
 		TotalPrice:           TotalAmount,
 	}

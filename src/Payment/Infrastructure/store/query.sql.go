@@ -18,8 +18,10 @@ INSERT INTO payments (
     orderID,
     totalAmount,
     created_at,
-    integratorExternalID
-    ) VALUES ($1, $2, $3, $4, $5) RETURNING id, orderid, totalamount, created_at, integratorexternalid
+    integratorExternalID,
+    kind_id,
+    status_id
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, orderid, totalamount, created_at, integratorexternalid, status_id, kind_id
 `
 
 type CreatePaymentParams struct {
@@ -28,6 +30,8 @@ type CreatePaymentParams struct {
 	Totalamount          int64
 	CreatedAt            pgtype.Timestamp
 	Integratorexternalid pgtype.Text
+	KindID               int32
+	StatusID             int32
 }
 
 func (q *Queries) CreatePayment(ctx context.Context, arg CreatePaymentParams) (Payment, error) {
@@ -37,6 +41,8 @@ func (q *Queries) CreatePayment(ctx context.Context, arg CreatePaymentParams) (P
 		arg.Totalamount,
 		arg.CreatedAt,
 		arg.Integratorexternalid,
+		arg.KindID,
+		arg.StatusID,
 	)
 	var i Payment
 	err := row.Scan(
@@ -45,6 +51,8 @@ func (q *Queries) CreatePayment(ctx context.Context, arg CreatePaymentParams) (P
 		&i.Totalamount,
 		&i.CreatedAt,
 		&i.Integratorexternalid,
+		&i.StatusID,
+		&i.KindID,
 	)
 	return i, err
 }
@@ -58,8 +66,19 @@ func (q *Queries) DeletePayment(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
+const getKindById = `-- name: GetKindById :one
+SELECT id, name FROM payment_kind WHERE id = $1 LIMIT 1
+`
+
+func (q *Queries) GetKindById(ctx context.Context, id int32) (PaymentKind, error) {
+	row := q.db.QueryRow(ctx, getKindById, id)
+	var i PaymentKind
+	err := row.Scan(&i.ID, &i.Name)
+	return i, err
+}
+
 const getPayment = `-- name: GetPayment :one
-SELECT id, orderid, totalamount, created_at, integratorexternalid FROM payments WHERE id = $1 LIMIT 1
+SELECT id, orderid, totalamount, created_at, integratorexternalid, status_id, kind_id FROM payments WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetPayment(ctx context.Context, id uuid.UUID) (Payment, error) {
@@ -71,12 +90,14 @@ func (q *Queries) GetPayment(ctx context.Context, id uuid.UUID) (Payment, error)
 		&i.Totalamount,
 		&i.CreatedAt,
 		&i.Integratorexternalid,
+		&i.StatusID,
+		&i.KindID,
 	)
 	return i, err
 }
 
 const getPaymentByOrderId = `-- name: GetPaymentByOrderId :one
-SELECT id, orderid, totalamount, created_at, integratorexternalid FROM payments WHERE orderID = $1 LIMIT 1
+SELECT id, orderid, totalamount, created_at, integratorexternalid, status_id, kind_id FROM payments WHERE orderID = $1 LIMIT 1
 `
 
 func (q *Queries) GetPaymentByOrderId(ctx context.Context, orderid string) (Payment, error) {
@@ -88,12 +109,90 @@ func (q *Queries) GetPaymentByOrderId(ctx context.Context, orderid string) (Paym
 		&i.Totalamount,
 		&i.CreatedAt,
 		&i.Integratorexternalid,
+		&i.StatusID,
+		&i.KindID,
 	)
 	return i, err
 }
 
+const getPaymentKind = `-- name: GetPaymentKind :many
+SELECT id, name FROM payment_kind
+`
+
+func (q *Queries) GetPaymentKind(ctx context.Context) ([]PaymentKind, error) {
+	rows, err := q.db.Query(ctx, getPaymentKind)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []PaymentKind
+	for rows.Next() {
+		var i PaymentKind
+		if err := rows.Scan(&i.ID, &i.Name); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getPaymentWithKindAndStatusName = `-- name: GetPaymentWithKindAndStatusName :one
+SELECT 
+    p.id, p.orderid, p.totalamount, p.created_at, p.integratorexternalid, p.status_id, p.kind_id,
+    pk.name as kind_name,
+    ps.name as status_name
+FROM payments p
+JOIN payment_kind pk ON p.kind_id = pk.id
+JOIN payment_status ps ON p.status_id = ps.id
+WHERE p.id = $1 
+LIMIT 1
+`
+
+type GetPaymentWithKindAndStatusNameRow struct {
+	ID                   uuid.UUID
+	Orderid              string
+	Totalamount          int64
+	CreatedAt            pgtype.Timestamp
+	Integratorexternalid pgtype.Text
+	StatusID             int32
+	KindID               int32
+	KindName             string
+	StatusName           string
+}
+
+func (q *Queries) GetPaymentWithKindAndStatusName(ctx context.Context, id uuid.UUID) (GetPaymentWithKindAndStatusNameRow, error) {
+	row := q.db.QueryRow(ctx, getPaymentWithKindAndStatusName, id)
+	var i GetPaymentWithKindAndStatusNameRow
+	err := row.Scan(
+		&i.ID,
+		&i.Orderid,
+		&i.Totalamount,
+		&i.CreatedAt,
+		&i.Integratorexternalid,
+		&i.StatusID,
+		&i.KindID,
+		&i.KindName,
+		&i.StatusName,
+	)
+	return i, err
+}
+
+const getStatusById = `-- name: GetStatusById :one
+SELECT id, name FROM payment_status WHERE id = $1 LIMIT 1
+`
+
+func (q *Queries) GetStatusById(ctx context.Context, id int32) (PaymentStatus, error) {
+	row := q.db.QueryRow(ctx, getStatusById, id)
+	var i PaymentStatus
+	err := row.Scan(&i.ID, &i.Name)
+	return i, err
+}
+
 const listPayments = `-- name: ListPayments :many
-SELECT id, orderid, totalamount, created_at, integratorexternalid FROM payments ORDER BY created_at DESC
+SELECT id, orderid, totalamount, created_at, integratorexternalid, status_id, kind_id FROM payments ORDER BY created_at DESC
 `
 
 func (q *Queries) ListPayments(ctx context.Context) ([]Payment, error) {
@@ -111,6 +210,8 @@ func (q *Queries) ListPayments(ctx context.Context) ([]Payment, error) {
 			&i.Totalamount,
 			&i.CreatedAt,
 			&i.Integratorexternalid,
+			&i.StatusID,
+			&i.KindID,
 		); err != nil {
 			return nil, err
 		}
@@ -122,8 +223,32 @@ func (q *Queries) ListPayments(ctx context.Context) ([]Payment, error) {
 	return items, nil
 }
 
+const listStatus = `-- name: ListStatus :many
+SELECT id, name FROM payment_status
+`
+
+func (q *Queries) ListStatus(ctx context.Context) ([]PaymentStatus, error) {
+	rows, err := q.db.Query(ctx, listStatus)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []PaymentStatus
+	for rows.Next() {
+		var i PaymentStatus
+		if err := rows.Scan(&i.ID, &i.Name); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updatePayment = `-- name: UpdatePayment :exec
-UPDATE payments SET orderID = $2, totalAmount = $3, created_at = $4, integratorExternalID = $5 WHERE id = $1
+UPDATE payments SET orderID = $2, totalAmount = $3, created_at = $4, integratorExternalID = $5, kind_id = $6, status_id = $7 WHERE id = $1
 `
 
 type UpdatePaymentParams struct {
@@ -132,6 +257,8 @@ type UpdatePaymentParams struct {
 	Totalamount          int64
 	CreatedAt            pgtype.Timestamp
 	Integratorexternalid pgtype.Text
+	KindID               int32
+	StatusID             int32
 }
 
 func (q *Queries) UpdatePayment(ctx context.Context, arg UpdatePaymentParams) error {
@@ -141,6 +268,8 @@ func (q *Queries) UpdatePayment(ctx context.Context, arg UpdatePaymentParams) er
 		arg.Totalamount,
 		arg.CreatedAt,
 		arg.Integratorexternalid,
+		arg.KindID,
+		arg.StatusID,
 	)
 	return err
 }

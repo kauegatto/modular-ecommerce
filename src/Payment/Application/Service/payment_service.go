@@ -12,8 +12,9 @@ import (
 )
 
 type PaymentService struct {
-	eventBus          eventBus.Eventbus
-	paymentRepository ports.PaymentRepository
+	eventBus             eventBus.Eventbus
+	paymentRepository    ports.PaymentRepository
+	transactionProcessor ports.TransactionProcessor
 }
 
 func NewPaymentService(eventBus eventBus.Eventbus, paymentRepository ports.PaymentRepository) (*PaymentService, error) {
@@ -61,6 +62,32 @@ func (s *PaymentService) handleCreatePayment(event eventBus.Event) error {
 	return nil
 }
 
+func (s *PaymentService) CapturePayment(ctx context.Context, PaymentID models.PaymentID, card *models.Card) error {
+	// if error on capture process, already cancel it.
+	// In a real world scenario we'd just republish the event and avoid losses
+
+	// if capture is debit and succeded (synchronous operation) -> confirm it
+	// else, just wait for the callback from payment gateway
+	payment, err := s.paymentRepository.GetPaymentById(ctx, PaymentID)
+	if err != nil {
+		return fmt.Errorf("error getting payment %v", err)
+	}
+
+	err = s.transactionProcessor.Capture(ctx, card, payment)
+	if err != nil {
+		err = s.CancelPayment(ctx, PaymentID)
+		if err != nil {
+			return err
+		}
+		return fmt.Errorf("error processing payment %v", err)
+	}
+	if payment.Kind == models.PaymentKindDebit {
+		return s.ConfirmPayment(ctx, PaymentID)
+	}
+
+	return nil
+}
+
 func (s *PaymentService) ConfirmPayment(ctx context.Context, PaymentID models.PaymentID) error {
 	payment, err := s.GetPaymentById(ctx, PaymentID)
 	if err != nil {
@@ -91,6 +118,7 @@ func (s *PaymentService) CancelPayment(ctx context.Context, PaymentID models.Pay
 	if err != nil {
 		return fmt.Errorf("error getting payment %v", err)
 	}
+
 	err = payment.CancelPayment()
 	if err != nil {
 		return fmt.Errorf("error cancelling payment %v", err)

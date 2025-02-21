@@ -39,7 +39,7 @@ Content-Type: application/json
   "reason": "Customer requested cancellation"
 }
 
-### Get an Payment
+### Get an Payment by Order Id
 GET {{hostName}}/api/payment/order/{{placeOrder.response.body.order_id}}
 
 ### Get an Payment by PaymentId
