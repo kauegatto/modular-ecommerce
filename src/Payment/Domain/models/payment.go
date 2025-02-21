@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -81,6 +82,9 @@ func NewPaymentFromRehidration(
 	TotalAmount Money,
 	kind PaymentKind,
 ) *Payment {
+	if kind == "" || status == "" {
+		log.Fatalf("treat kind: %s status %s", kind, status)
+	}
 	return &Payment{
 		ID:                   ID,
 		OrderId:              OrderId,

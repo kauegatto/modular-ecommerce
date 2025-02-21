@@ -10,7 +10,7 @@ import (
 )
 
 type CardNumber struct {
-	value string
+	Value string
 }
 
 func NewCardNumber(pan string) (*CardNumber, error) {
@@ -25,7 +25,7 @@ func NewCardNumber(pan string) (*CardNumber, error) {
 		return nil, errors.New("invalid card number checksum")
 	}
 
-	return &CardNumber{value: pan}, nil
+	return &CardNumber{Value: pan}, nil
 }
 
 func (cn *CardNumber) String() string {
@@ -33,11 +33,11 @@ func (cn *CardNumber) String() string {
 }
 
 func (cn *CardNumber) LastFourDigits() string {
-	return cn.value[len(cn.value)-4:]
+	return cn.Value[len(cn.Value)-4:]
 }
 
 type SecurityCode struct {
-	value string
+	Value string
 }
 
 func (sc *SecurityCode) String() string {
@@ -48,7 +48,7 @@ func NewSecurityCode(code string) (*SecurityCode, error) {
 	if !regexp.MustCompile(`^\d{3,4}$`).MatchString(code) {
 		return nil, errors.New("security code must be 3 or 4 digits")
 	}
-	return &SecurityCode{value: code}, nil
+	return &SecurityCode{Value: code}, nil
 }
 
 type ExpirationDate struct {
@@ -87,7 +87,7 @@ func (ed *ExpirationDate) String() string {
 }
 
 type CardHolderName struct {
-	value string
+	Value string
 }
 
 func NewCardHolderName(name string) (*CardHolderName, error) {
@@ -100,7 +100,7 @@ func NewCardHolderName(name string) (*CardHolderName, error) {
 		return nil, errors.New("cardholder name contains invalid characters")
 	}
 
-	return &CardHolderName{value: name}, nil
+	return &CardHolderName{Value: name}, nil
 }
 
 type Card struct {
@@ -153,6 +153,10 @@ func (c *Card) ExpirationDate() *ExpirationDate {
 
 func (c *Card) CardHolderName() *CardHolderName {
 	return c.holderName
+}
+
+func (c *Card) SecurityCode() *SecurityCode {
+	return c.securityCode
 }
 
 func isLuhnValid(pan string) bool {
