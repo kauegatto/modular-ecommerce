@@ -6,5 +6,10 @@ import (
 )
 
 type TransactionProcessor interface {
-	Capture(ctx context.Context, card *models.Card, payment *models.Payment) error
+	Capture(ctx context.Context, card *models.Card, payment *models.Payment) (CaptureTransactionResponse, error)
+	RequestCancellation(ctx context.Context, externalPaymentId string) error
+}
+
+type CaptureTransactionResponse struct {
+	ExternalTransactionId string
 }

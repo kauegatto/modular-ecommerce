@@ -14,3 +14,13 @@ type OrderPlaced struct {
 func (p OrderPlaced) Name() string {
 	return "OrderPlaced"
 }
+
+type OrderCancelled struct {
+	OrderID     string
+	CancelledAt time.Time
+	Reason      string
+}
+
+func (p OrderCancelled) Name() string {
+	return "OrderCancelled"
+}

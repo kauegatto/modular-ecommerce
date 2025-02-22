@@ -14,12 +14,13 @@ type PaymentStatus string
 type PaymentKind string
 
 const (
-	PaymentStatusPlaced    PaymentStatus = "PAYMENT_CREATED"
-	PaymentStatusPending   PaymentStatus = "PAYMENT_PENDING_PAYMENT"
-	PaymentStatusCompleted PaymentStatus = "PAYMENT_COMPLETED"
-	PaymentStatusCancelled PaymentStatus = "PAYMENT_CANCELLED"
-	PaymentKindDebit       PaymentKind   = "DEBIT"
-	PaymentKindCredit      PaymentKind   = "CREDIT"
+	PaymentStatusPlaced        PaymentStatus = "PAYMENT_CREATED"
+	PaymentStatusPending       PaymentStatus = "PAYMENT_PENDING_PAYMENT"
+	PaymentStatusCompleted     PaymentStatus = "PAYMENT_COMPLETED"
+	PaymentStatusPendingRefund PaymentStatus = "PAYMENT_PENDING_REFUND"
+	PaymentStatusRefunded      PaymentStatus = "PAYMENT_REFUNDED"
+	PaymentKindDebit           PaymentKind   = "DEBIT"
+	PaymentKindCredit          PaymentKind   = "CREDIT"
 )
 
 type Payment struct {
@@ -40,6 +41,11 @@ func (p *Payment) CompletePayment() error {
 	return nil
 }
 
+func (p *Payment) AddExternalIntegratorID(id string) error {
+	p.ExternalIntegratorID = id
+	return nil
+}
+
 func (p *Payment) PendingPayment() error {
 	if p.Status != PaymentStatusPlaced {
 		return fmt.Errorf("cannot set Payment to pending with status: %s", p.Status)
@@ -48,17 +54,30 @@ func (p *Payment) PendingPayment() error {
 	return nil
 }
 
-func (p *Payment) CancelPayment() error {
-	if p.Status == PaymentStatusCancelled {
-		return fmt.Errorf("Payment is already cancelled")
+func (p *Payment) RequestRefund() error {
+	if p.Status == PaymentStatusPendingRefund {
+		return fmt.Errorf("Payment is already pending refund")
 	}
-	p.Status = PaymentStatusCancelled
+	if p.Status == PaymentStatusRefunded {
+		return fmt.Errorf("Payment was alreday refunded")
+	}
+
+	p.Status = PaymentStatusPendingRefund
+	return nil
+}
+
+func (p *Payment) ConfirmRefund() error {
+	if p.Status == PaymentStatusRefunded {
+		return fmt.Errorf("Payment was alreday refunded")
+	}
+
+	p.Status = PaymentStatusRefunded
 	return nil
 }
 
 func NewPayment(orderId string, totalAmount Money) (*Payment, error) {
 	if totalAmount < 100 {
-		return nil, fmt.Errorf("Can not create order less than R$1BRL")
+		return nil, fmt.Errorf("can not create order less than R$1BRL")
 	}
 
 	id, _ := uuid.NewV7()

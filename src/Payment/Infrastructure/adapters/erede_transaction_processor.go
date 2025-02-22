@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"ecommerce/Payment/Domain/models"
+	"ecommerce/Payment/Domain/ports"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -57,7 +58,7 @@ type eRedeResponse struct {
 	Authorization string `json:"authorization"`
 }
 
-func (p *ERedeProcessor) Capture(ctx context.Context, card *models.Card, payment *models.Payment) error {
+func (p *ERedeProcessor) Capture(ctx context.Context, card *models.Card, payment *models.Payment) (ports.CaptureTransactionResponse, error) {
 	expDate := card.ExpirationDate()
 	expMonth, expYear := parseExpirationDate(expDate.String())
 
@@ -80,19 +81,19 @@ func (p *ERedeProcessor) Capture(ctx context.Context, card *models.Card, payment
 		ExpirationMonth: expMonth,
 		ExpirationYear:  expYear,
 		SecurityCode:    cardDTO.SecurityCode,
-		SoftDescriptor:  "MYSTORE",
+		SoftDescriptor:  "Ecommerce Do Kaue :)",
 	}
 
 	payload, err := json.Marshal(request)
 	if err != nil {
-		return fmt.Errorf("error marshaling request: %w", err)
+		return ports.CaptureTransactionResponse{}, fmt.Errorf("error marshaling request: %w", err)
 	}
 
 	req, err := http.NewRequestWithContext(ctx, "POST",
 		fmt.Sprintf("%s/transactions", p.config.BaseURL),
 		bytes.NewBuffer(payload))
 	if err != nil {
-		return fmt.Errorf("error creating request: %w", err)
+		return ports.CaptureTransactionResponse{}, fmt.Errorf("error creating request: %w", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -101,23 +102,29 @@ func (p *ERedeProcessor) Capture(ctx context.Context, card *models.Card, payment
 
 	resp, err := p.client.Do(req)
 	if err != nil {
-		return fmt.Errorf("error executing request: %w", err)
+		return ports.CaptureTransactionResponse{}, fmt.Errorf("error executing request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	var response eRedeResponse
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		return fmt.Errorf("error decoding response: %w", err)
+		return ports.CaptureTransactionResponse{}, fmt.Errorf("error decoding response: %w", err)
 	}
 
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
-		return fmt.Errorf("transaction failed: %s - %s",
+		return ports.CaptureTransactionResponse{}, fmt.Errorf("transaction failed: %s - %s",
 			response.ReturnCode, response.ReturnMessage)
 	}
 
 	payment.ExternalIntegratorID = response.TID
 
-	return nil
+	return ports.CaptureTransactionResponse{
+		ExternalTransactionId: response.TID,
+	}, nil
+}
+
+func (p *ERedeProcessor) RequestCancellation(ctx context.Context, eRedeTID string) error {
+	return fmt.Errorf("not implemented")
 }
 
 func parseExpirationDate(expDate string) (month, year int) {

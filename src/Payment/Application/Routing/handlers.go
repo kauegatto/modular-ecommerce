@@ -73,7 +73,7 @@ func (h *PaymentHandler) handleCompletePayment(c *gin.Context) {
 func (h *PaymentHandler) handleCancelPayment(c *gin.Context) {
 	paymentId := parseToDomainIdAndReturnIfInvalid(c)
 
-	if err := h.PaymentService.CancelPayment(c, paymentId); err != nil {
+	if err := h.PaymentService.RequestPaymentRefund(c, paymentId); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})

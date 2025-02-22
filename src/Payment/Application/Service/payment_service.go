@@ -31,8 +31,9 @@ func NewPaymentService(eventBus eventBus.Eventbus, paymentRepository ports.Payme
 	return service, nil
 }
 
-func (s *PaymentService) subscribeToEvents() error {
+func (s *PaymentService) subscribeToEvents() error { // todo move to router
 	s.eventBus.Subscribe(&incoming.OrderPlaced{}, s.handleCreatePayment)
+	s.eventBus.Subscribe(&incoming.OrderCancelled{}, s.handleOrderCancelled)
 	return nil
 }
 
@@ -63,6 +64,24 @@ func (s *PaymentService) handleCreatePayment(event eventBus.Event) error {
 	return nil
 }
 
+func (s *PaymentService) handleOrderCancelled(event eventBus.Event) error {
+	parsedEvent, ok := event.(*incoming.OrderCancelled)
+	if !ok {
+		return fmt.Errorf("expected OrderCancelled, got %T", event)
+	}
+
+	payment, err := s.GetPaymentByOrderId(context.Background(), parsedEvent.OrderID)
+	if err != nil {
+		return fmt.Errorf("error getting payment from order with id %s %v", parsedEvent.OrderID, err)
+	}
+
+	err = s.RequestPaymentRefund(context.Background(), payment.ID)
+	if err != nil {
+		return fmt.Errorf("error requesting payment refound %v", err)
+	}
+	return nil
+}
+
 func (s *PaymentService) CapturePayment(ctx context.Context, PaymentID models.PaymentID, card *models.Card) error {
 	// if error on capture process, already cancel it.
 	// In a real world scenario we'd just republish the event and avoid losses
@@ -74,18 +93,18 @@ func (s *PaymentService) CapturePayment(ctx context.Context, PaymentID models.Pa
 		return fmt.Errorf("error getting payment %v", err)
 	}
 
-	err = s.transactionProcessor.Capture(ctx, card, payment)
+	captureResponse, err := s.transactionProcessor.Capture(ctx, card, payment)
 	if err != nil {
-		err = s.CancelPayment(ctx, PaymentID)
+		err = s.RequestPaymentRefund(ctx, PaymentID)
 		if err != nil {
 			return err
 		}
 		return fmt.Errorf("error processing payment %v", err)
 	}
 	if payment.Kind == models.PaymentKindDebit {
-		return s.ConfirmPayment(ctx, PaymentID)
+		s.ConfirmPayment(ctx, PaymentID)
 	}
-
+	s.AddExternalId(ctx, PaymentID, captureResponse.ExternalTransactionId)
 	return nil
 }
 
@@ -114,23 +133,28 @@ func (s *PaymentService) ConfirmPayment(ctx context.Context, PaymentID models.Pa
 	return nil
 }
 
-func (s *PaymentService) CancelPayment(ctx context.Context, PaymentID models.PaymentID) error {
+func (s *PaymentService) RequestPaymentRefund(ctx context.Context, PaymentID models.PaymentID) error {
 	payment, err := s.GetPaymentById(ctx, PaymentID)
 	if err != nil {
 		return fmt.Errorf("error getting payment %v", err)
 	}
 
-	err = payment.CancelPayment()
+	err = payment.RequestRefund()
 	if err != nil {
-		return fmt.Errorf("error cancelling payment %v", err)
+		return fmt.Errorf("error requesting refound for payment %v", err)
 	}
 
 	err = s.paymentRepository.Update(ctx, payment)
 	if err != nil {
-		return fmt.Errorf("error cancelling payment on database %v", err)
+		return fmt.Errorf("error requesting refound for payment on database %v", err)
 	}
 
-	paymentCancelled := outgoing.PaymentCancelled{
+	err = s.transactionProcessor.RequestCancellation(ctx, payment.ExternalIntegratorID)
+	if err != nil {
+		return fmt.Errorf("error requesting payment cancellation %v", err)
+	}
+
+	paymentCancelled := outgoing.PaymentRefundRequested{
 		OrderID:   payment.OrderId,
 		PaymentID: PaymentID,
 		Amount:    string(payment.TotalPrice),
@@ -154,4 +178,20 @@ func (s *PaymentService) GetPaymentByOrderId(ctx context.Context, orderId string
 		return &models.Payment{}, fmt.Errorf("error finding payment on database %v", err)
 	}
 	return payment, nil
+}
+
+func (s *PaymentService) AddExternalId(ctx context.Context, PaymentID models.PaymentID, externalId string) error {
+	payment, err := s.GetPaymentById(ctx, PaymentID)
+	if err != nil {
+		return fmt.Errorf("error getting payment %v", err)
+	}
+	err = payment.AddExternalIntegratorID(externalId)
+	if err != nil {
+		return fmt.Errorf("error completing payment %v", err)
+	}
+	err = s.paymentRepository.Update(ctx, payment)
+	if err != nil {
+		return fmt.Errorf("error updating payment %v", err)
+	}
+	return nil
 }

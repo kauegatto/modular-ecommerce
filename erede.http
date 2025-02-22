@@ -1,0 +1,27 @@
+@Authorization=Basic yourBasic
+@BaseURL=https://sandbox-erede.useredecloud.com.br/
+@PV=59529764
+## Place an Order
+# @name placeOrder
+# @prompt customer_id Seu id de usuário
+POST {{BaseURL}}/v1/transactions
+Content-Type: application/json
+Authorization: {{Authorization}}
+
+{
+  "customer_id": "{{customer_id}}",
+  "items": [
+    {
+      "code": "P001",
+      "name": "Product 1",
+      "unit_price": 1500,
+      "quantity": 2
+    },
+    {
+      "code": "P002",
+      "name": "Product 2",
+      "unit_price": 100,
+      "quantity": 1
+    }
+  ]
+}
