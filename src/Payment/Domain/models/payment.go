@@ -15,7 +15,7 @@ type PaymentKind string
 
 const (
 	PaymentStatusPlaced        PaymentStatus = "PAYMENT_CREATED"
-	PaymentStatusPending       PaymentStatus = "PAYMENT_PENDING_PAYMENT"
+	PaymentStatusPending       PaymentStatus = "PAYMENT_PENDING"
 	PaymentStatusCompleted     PaymentStatus = "PAYMENT_COMPLETED"
 	PaymentStatusPendingRefund PaymentStatus = "PAYMENT_PENDING_REFUND"
 	PaymentStatusRefunded      PaymentStatus = "PAYMENT_REFUNDED"
