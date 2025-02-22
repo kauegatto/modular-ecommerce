@@ -91,7 +91,7 @@ func (p *ERedeProcessor) Capture(ctx context.Context, card *models.Card, payment
 	}
 
 	req, err := http.NewRequestWithContext(ctx, "POST",
-		fmt.Sprintf("%s/transactions", p.config.BaseURL),
+		fmt.Sprintf("%s/v1/transactions", p.config.BaseURL),
 		bytes.NewBuffer(payload))
 	if err != nil {
 		return ports.CaptureTransactionResponse{}, fmt.Errorf("error creating request: %w", err)
