@@ -43,6 +43,10 @@ func (p *Payment) CompletePayment() error {
 
 func (p *Payment) AddExternalIntegratorID(id string) error {
 	p.ExternalIntegratorID = id
+	err := p.PendingPayment()
+	if err != nil {
+		return fmt.Errorf("failed move payment to pending: %v", err)
+	}
 	return nil
 }
 
@@ -55,6 +59,9 @@ func (p *Payment) PendingPayment() error {
 }
 
 func (p *Payment) RequestRefund() error {
+	if p.Status == PaymentStatusPlaced || p.ExternalIntegratorID == "" {
+		return fmt.Errorf("Payment was not requested to capture yet")
+	}
 	if p.Status == PaymentStatusPendingRefund {
 		return fmt.Errorf("Payment is already pending refund")
 	}
