@@ -5,6 +5,7 @@ import (
 	"ecommerce/Payment/Domain/models"
 	"ecommerce/Payment/Infrastructure/store"
 	"fmt"
+	"strings"
 
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -126,7 +127,7 @@ func (repo PostgresRepository) getDbKind(ctx context.Context, kind *models.Payme
 	}
 
 	for _, k := range allKinds {
-		if k.Name == string(*kind) {
+		if strings.EqualFold(k.Name, string(*kind)) {
 			return &k, nil
 		}
 	}
@@ -141,7 +142,7 @@ func (repo PostgresRepository) getDbStatus(ctx context.Context, status *models.P
 	}
 
 	for _, s := range allStatuses {
-		if s.Name == string(*status) {
+		if strings.EqualFold(s.Name, string(*status)) {
 			return &s, nil
 		}
 	}
