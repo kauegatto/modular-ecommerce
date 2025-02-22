@@ -20,9 +20,8 @@ type ERedeConfig struct {
 }
 
 func LoadConfig() error {
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath("../")
+	viper.SetConfigFile("../Payment/config.yaml")
+
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
@@ -37,7 +36,6 @@ func LoadConfig() error {
 	if err := viper.Unmarshal(&config); err != nil {
 		return fmt.Errorf("unable to decode config into struct: %w", err)
 	}
-
 	C = &config
 	return nil
 }
