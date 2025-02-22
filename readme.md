@@ -9,7 +9,16 @@
   * SQLc
   * Goose
   * Go 1.22+
-  
+
+## Observações
+
+Esse projeto tem como foco aprendizado, estou usando diferentes ferramentas, práticas e padrões que já ouvi falar bem mas nunca tive a oportunidade de pôr em prática em um projeto real em grande escala. Esse projeto tem como foco ser grande, escalável, apesar disso, ainda é focado em conhecimento. Por enquanto só o módulo de order, configuração do nats, db e publicação e recebimento de eventos está desenvolvido.
+
+## Modelos de Domínio, diagramas de Arquitetura
+
+Você pode encontrar diagramas de arquitetura à nível de solução e módulo (por enquanto, só o módulo de order no e-commerce.drawio na raíz do projeto. Lá poderá encontar diagramas de classes, máquinas de estados e alguns outros diagramas representando os objetos de domínio em uma abordagem orientada à domínio (DDD), deixando claro aggregates, entidades e vo's
+
+
 ## 📭 Event Driven (Com NATS.io)
 
 [Post no dev.to](https://dev.to/kauegatto/wip-arquiteturas-orientadas-a-eventos-e-monolitos-modulares-3ac2-temp-slug-5623860?preview=5be5a5733061cd124a999f8373fb107687897a9e3b03fb92fc01952737f53d3682f42925b507aa4bb02858c7fc797539b2686e03222e024f271ddb42) sobre arquitetura orientada à eventos, especialmente em sistemas monolíticos modularizados e microserviços:
