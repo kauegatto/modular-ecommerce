@@ -176,7 +176,7 @@ func (s *PaymentService) RequestPaymentRefund(ctx context.Context, PaymentID mod
 		return fmt.Errorf("error requesting refound for payment on database %v", err)
 	}
 
-	err = s.transactionProcessor.RequestCancellation(ctx, payment.ExternalIntegratorID)
+	err = s.transactionProcessor.RequestCancellation(ctx, payment.ExternalIntegratorID, int(payment.TotalPrice))
 	if err != nil {
 		return fmt.Errorf("error requesting payment cancellation %v", err)
 	}
