@@ -12,8 +12,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/moul/http2curl"
 )
 
 type ERedeConfig struct {
@@ -64,9 +62,6 @@ type transactionResponse struct {
 }
 
 func (p *ERedeProcessor) Capture(ctx context.Context, card *models.Card, payment *models.Payment) (ports.CaptureTransactionResponse, error) {
-	newctx, cancel := context.WithTimeout(ctx, time.Second*30)
-	defer cancel()
-
 	expDate := card.ExpirationDate()
 	expMonth, expYear := parseExpirationDate(expDate.String())
 
@@ -97,20 +92,18 @@ func (p *ERedeProcessor) Capture(ctx context.Context, card *models.Card, payment
 		return ports.CaptureTransactionResponse{}, fmt.Errorf("error marshaling request: %w", err)
 	}
 
-	req, err := http.NewRequestWithContext(newctx, "POST",
+	req, err := http.NewRequest("POST",
 		fmt.Sprintf("%s/v1/transactions", p.config.BaseURL),
 		bytes.NewBuffer(payload))
 	if err != nil {
 		return ports.CaptureTransactionResponse{}, fmt.Errorf("error creating request: %w", err)
 	}
+
 	req.SetBasicAuth(p.config.PV, p.config.Token)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("ApplicationId", p.config.PV)
 
 	resp, err := p.client.Do(req)
-
-	command, _ := http2curl.GetCurlCommand(req)
-	fmt.Println(command)
 
 	if err != nil {
 		return ports.CaptureTransactionResponse{}, fmt.Errorf("error executing request: %w", err)
@@ -150,9 +143,6 @@ type RefundResponse struct {
 }
 
 func (p *ERedeProcessor) RequestCancellation(ctx context.Context, eRedeTID string, amount int) error {
-	newctx, cancel := context.WithTimeout(ctx, time.Second*30)
-	defer cancel()
-
 	url := fmt.Sprintf("%s/v1/transactions/%s/refunds", p.config.BaseURL, eRedeTID)
 
 	reqBody := RefundRequest{
@@ -170,7 +160,7 @@ func (p *ERedeProcessor) RequestCancellation(ctx context.Context, eRedeTID strin
 		return fmt.Errorf("failed to marshal refund request: %w", err)
 	}
 
-	req, err := http.NewRequestWithContext(newctx, http.MethodPost, url, bytes.NewBuffer(jsonBody))
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonBody))
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
 	}

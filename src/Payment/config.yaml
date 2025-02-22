@@ -1,5 +1,5 @@
 eRede:
   pv: 59529764
-  authorization: your token
+  authorization: a
   baseURL: https://sandbox-erede.useredecloud.com.br
-  timeout: 300
+  timeout: 0
