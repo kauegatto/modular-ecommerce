@@ -111,7 +111,7 @@ func (s *PaymentService) CapturePayment(ctx context.Context, PaymentID models.Pa
 }
 
 func (s *PaymentService) ConfirmPayment(ctx context.Context, PaymentID models.PaymentID) error {
-	payment, err := s.GetPaymentById(ctx, PaymentID)
+	payment, err := s.GetPaymentById(ctx, PaymentID)	
 	if err != nil {
 		return fmt.Errorf("error getting payment %v", err)
 	}

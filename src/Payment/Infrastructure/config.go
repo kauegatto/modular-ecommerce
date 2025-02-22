@@ -21,7 +21,6 @@ type ERedeConfig struct {
 
 func LoadConfig() error {
 	viper.SetConfigFile("../Payment/config.yaml")
-
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
@@ -36,6 +35,7 @@ func LoadConfig() error {
 	if err := viper.Unmarshal(&config); err != nil {
 		return fmt.Errorf("unable to decode config into struct: %w", err)
 	}
+	fmt.Printf("pv: %s configured", config.ERedeConfig.PV)
 	C = &config
 	return nil
 }
