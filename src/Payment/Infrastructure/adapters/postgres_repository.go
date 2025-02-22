@@ -57,10 +57,10 @@ func (repo PostgresRepository) Update(ctx context.Context, Payment *models.Payme
 		ID:                   Payment.ID,
 		Orderid:              Payment.OrderId,
 		Totalamount:          int64(Payment.TotalPrice),
-		CreatedAt:            pgtype.Timestamp{Time: Payment.CreatedAt},
-		Integratorexternalid: pgtype.Text{String: Payment.ExternalIntegratorID},
-		KindID:               0,
-		StatusID:             0,
+		CreatedAt:            pgtype.Timestamp{Time: Payment.CreatedAt, Valid: true},
+		Integratorexternalid: pgtype.Text{String: Payment.ExternalIntegratorID, Valid: true},
+		KindID:               1, // todo
+		StatusID:             1, // todo
 	}
 	err := repo.queries.UpdatePayment(ctx, request)
 	if err != nil {
