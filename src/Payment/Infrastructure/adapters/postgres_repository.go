@@ -53,16 +53,26 @@ func (repo PostgresRepository) Create(ctx context.Context, Payment *models.Payme
 }
 
 func (repo PostgresRepository) Update(ctx context.Context, Payment *models.Payment) error {
+	kind, err := repo.getDbKind(ctx, &Payment.Kind)
+	if err != nil {
+		return fmt.Errorf("error getting paymentKind from db %v", err)
+	}
+
+	status, err := repo.getDbStatus(ctx, &Payment.Status)
+	if err != nil {
+		return fmt.Errorf("error getting paymentStatus from db %v", err)
+	}
+
 	request := store.UpdatePaymentParams{
 		ID:                   Payment.ID,
 		Orderid:              Payment.OrderId,
 		Totalamount:          int64(Payment.TotalPrice),
 		CreatedAt:            pgtype.Timestamp{Time: Payment.CreatedAt, Valid: true},
 		Integratorexternalid: pgtype.Text{String: Payment.ExternalIntegratorID, Valid: true},
-		KindID:               1, // todo
-		StatusID:             1, // todo
+		KindID:               kind.ID,
+		StatusID:             status.ID,
 	}
-	err := repo.queries.UpdatePayment(ctx, request)
+	err = repo.queries.UpdatePayment(ctx, request)
 	if err != nil {
 		return fmt.Errorf("error creating payment %v", err)
 
