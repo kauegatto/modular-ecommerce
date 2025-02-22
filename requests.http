@@ -1,5 +1,5 @@
-@orderId=01950796-e2e7-74c6-bf61-3c2fd91d9e2d
-@paymentId=01951674-0f41-7a01-b931-0fbba0e5cc30
+@orderId=01952bbb-4a96-79c1-bd69-f47a8a74644
+@paymentId=01952bcc-0bb2-7410-a394-fbb76cf6169a
 @hostName=http://localhost:8080
 
 ## Place an Order
@@ -45,8 +45,18 @@ GET {{hostName}}/api/payment/order/{{placeOrder.response.body.order_id}}
 ### Get an Payment by PaymentId
 GET {{hostName}}/api/payment/{{paymentId}}
 
-### PostBack - Cancel payment
-POST {{hostName}}/api/payment/{{paymentId}}/cancel
+### Capture payment (send to eRede)
+POST {{hostName}}/api/payment/{{paymentId}}/capture
+Content-Type: "application/json"
 
+{
+    "cardHolderName": "John Snow",
+    "cardNumber": "2223020000000005",
+    "expirationMonth": "01",
+    "expirationYear": "2028",
+    "securityCode": "123",
+    "amount": 2000,
+    "reference": "reference"
+}
 ### PostBack - Complete payment
 POST {{hostName}}/api/payment/{{paymentId}}/complete
