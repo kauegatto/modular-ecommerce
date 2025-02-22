@@ -85,6 +85,7 @@ func NewPayment(orderId string, totalAmount Money) (*Payment, error) {
 		ID:                   id,
 		OrderId:              orderId,
 		ExternalIntegratorID: "",
+		Kind:                 PaymentKindCredit,
 		Status:               PaymentStatusPlaced,
 		CreatedAt:            time.Now().UTC(),
 		TotalPrice:           totalAmount,
