@@ -102,21 +102,6 @@ func (h *PaymentHandler) handleCompletePayment(c *gin.Context) {
 	})
 }
 
-func (h *PaymentHandler) handleCancelPayment(c *gin.Context) {
-	paymentId := parseToDomainIdAndReturnIfInvalid(c)
-
-	if err := h.PaymentService.RequestPaymentRefund(c, paymentId); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Payment canceled successfully",
-	})
-}
-
 func parseToDomainIdAndReturnIfInvalid(c *gin.Context) models.PaymentID {
 	paymentId, err := uuid.Parse(c.Param("paymentId"))
 	if err != nil {

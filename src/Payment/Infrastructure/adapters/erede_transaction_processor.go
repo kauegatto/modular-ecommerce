@@ -7,6 +7,7 @@ import (
 	"ecommerce/Payment/Domain/ports"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -119,7 +120,7 @@ func (p *ERedeProcessor) Capture(ctx context.Context, card *models.Card, payment
 		return ports.CaptureTransactionResponse{}, fmt.Errorf("transaction failed: %s - %s",
 			response.ReturnCode, response.ReturnMessage)
 	}
-
+	slog.Info("Success e-Rede Transaction. %dR$. TID: %s.", request.Amount/100, response.TID)
 	payment.ExternalIntegratorID = response.TID
 
 	return ports.CaptureTransactionResponse{

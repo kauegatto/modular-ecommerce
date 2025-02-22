@@ -34,17 +34,17 @@ func NewPaymentService(eventBus eventBus.Eventbus, paymentRepository ports.Payme
 }
 
 func (s *PaymentService) subscribeToEvents() error { // todo move to router
-	s.eventBus.Subscribe(&incoming.OrderPlaced{}, s.handleCreatePayment)
+	s.eventBus.Subscribe(&incoming.OrderPlaced{}, s.handleOrderPlaced)
 	s.eventBus.Subscribe(&incoming.OrderCancelled{}, s.handleOrderCancelled)
 	return nil
 }
 
-func (s *PaymentService) handleCreatePayment(event eventBus.Event) error {
+func (s *PaymentService) handleOrderPlaced(event eventBus.Event) error {
 	parsedEvent, ok := event.(*incoming.OrderPlaced)
 	if !ok {
 		return fmt.Errorf("expected PaymentCompleted, got %T", event)
 	}
-
+	slog.Info("Payment service captured OrderPlaced event. Creating Payment", slog.Attr{Key: "OrderId", Value: slog.StringValue(parsedEvent.OrderID)})
 	payment, err := models.NewPayment(parsedEvent.OrderID, models.Money(parsedEvent.Amount))
 	if err != nil {
 		return fmt.Errorf("handleCreatePayment: error creating payment. Err: %v", err)
@@ -54,7 +54,7 @@ func (s *PaymentService) handleCreatePayment(event eventBus.Event) error {
 	if err != nil {
 		return fmt.Errorf("error creating payment on database %v", err)
 	}
-
+	slog.Info("Payment created on dabatase", slog.Attr{Key: "ID", Value: slog.StringValue(payment.ID.String())})
 	// should have been done repository + event send transactionally using transactional outbox pattern
 	paymentCreated := outgoing.PaymentCreated{
 		OrderID:   payment.OrderId,
@@ -67,7 +67,7 @@ func (s *PaymentService) handleCreatePayment(event eventBus.Event) error {
 }
 
 func (s *PaymentService) handleOrderCancelled(event eventBus.Event) error {
-	slog.Info("Order cancellation event received. Will request refund")
+	slog.Info("Order cancellation event received. Will request refund.")
 	parsedEvent, ok := event.(*incoming.OrderCancelled)
 	if !ok {
 		return fmt.Errorf("expected OrderCancelled, got %T", event)

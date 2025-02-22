@@ -25,7 +25,6 @@ func (h *PaymentHandler) RegisterRoutes(router *gin.RouterGroup) {
 
 	router.POST("/:paymentId/capture", h.handleCapturePayment)
 	router.POST("/:paymentId/complete", h.handleCompletePayment)
-	router.POST("/:paymentId/cancel", h.handleCancelPayment)
 }
 
 func (h *PaymentHandler) Name() string {
