@@ -56,8 +56,4 @@ Content-Type: "application/json"
     "expirationMonth": "01",
     "expirationYear": "2028",
     "securityCode": "123",
-    "amount": 2000,
-    "reference": "reference"
 }
-### Refund Payment
-POST {{hostName}}/api/payment/{{GetPaymentByOrderId.response.body.payment.ID}}/refund
