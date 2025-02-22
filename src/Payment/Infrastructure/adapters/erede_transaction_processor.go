@@ -7,9 +7,13 @@ import (
 	"ecommerce/Payment/Domain/ports"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
+
+	"github.com/moul/http2curl"
 )
 
 type ERedeConfig struct {
@@ -78,8 +82,8 @@ func (p *ERedeProcessor) Capture(ctx context.Context, card *models.Card, payment
 	request := transactionRequest{
 		Capture:         true,
 		Kind:            kind,
-		Reference:       payment.OrderId,
-		Amount:          int(payment.TotalPrice), // Assuming Money is in cents
+		Reference:       strconv.Itoa(rand.Intn(100000000000)), // todo- works for now
+		Amount:          int(payment.TotalPrice),               // Assuming Money is in cents
 		CardHolder:      cardDTO.CardHolder,
 		CardNumber:      cardDTO.CardNumber,
 		ExpirationMonth: expMonth,
@@ -104,6 +108,9 @@ func (p *ERedeProcessor) Capture(ctx context.Context, card *models.Card, payment
 	req.Header.Set("ApplicationId", p.config.PV)
 
 	resp, err := p.client.Do(req)
+
+	command, _ := http2curl.GetCurlCommand(req)
+	fmt.Println(command)
 
 	if err != nil {
 		return ports.CaptureTransactionResponse{}, fmt.Errorf("error executing request: %w", err)
