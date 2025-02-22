@@ -8,21 +8,19 @@ import (
 	"ecommerce/Order/Domain/ports"
 	"ecommerce/SharedKernel/eventBus"
 	"fmt"
-	"log"
+	"log/slog"
 	"time"
 )
 
 type OrderService struct {
 	eventBus        eventBus.Eventbus
 	orderRepository ports.OrderRepository
-	logger          *log.Logger
 }
 
-func NewOrderService(eventBus eventBus.Eventbus, orderRepository ports.OrderRepository, logger *log.Logger) (*OrderService, error) {
+func NewOrderService(eventBus eventBus.Eventbus, orderRepository ports.OrderRepository) (*OrderService, error) {
 	service := &OrderService{
 		eventBus:        eventBus,
 		orderRepository: orderRepository,
-		logger:          logger,
 	}
 
 	if err := service.subscribeToEvents(); err != nil {
@@ -34,7 +32,6 @@ func NewOrderService(eventBus eventBus.Eventbus, orderRepository ports.OrderRepo
 
 func (s *OrderService) subscribeToEvents() error {
 	s.eventBus.Subscribe(&incoming.PaymentCompleted{}, s.handlePaymentCompleted)
-	s.eventBus.Subscribe(&outgoing.OrderCancelled{}, s.handleOrderCancelled)
 	return nil
 }
 
@@ -43,18 +40,8 @@ func (s *OrderService) handlePaymentCompleted(event eventBus.Event) error {
 	if !ok {
 		return fmt.Errorf("expected PaymentCompleted, got %T", event)
 	}
-	s.logger.Printf("[INFO] Processing payment completed for orderId %s", payment.OrderID)
-	return nil
-}
-
-func (s *OrderService) handleOrderCancelled(event eventBus.Event) error {
-	orderCancelled, ok := event.(*outgoing.OrderCancelled)
-	if !ok {
-		return fmt.Errorf("expected PaymentCompleted, got %T", event)
-	}
-
-	s.logger.Printf("[TEST] Processed Order Cancelled Event - Order_id: %s", orderCancelled.OrderID)
-	return nil
+	slog.Info("Processing payment completed for", slog.Attr{Key: "Payment", Value: slog.StringValue(payment.OrderID)})
+	return fmt.Errorf("not implemented")
 }
 
 func (s *OrderService) PlaceOrder(ctx context.Context, customerID string, items []models.OrderItem) (models.Order, error) {

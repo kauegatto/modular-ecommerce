@@ -1,0 +1,5 @@
+eRede:
+  pv: 59529764
+  authorization: a
+  baseURL: https://sandbox-erede.useredecloud.com.br
+  timeout: 0

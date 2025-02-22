@@ -115,6 +115,9 @@ func NewOrder(customerID string, items []OrderItem) (*Order, error) {
 	if err := order.AddItems(items); err != nil {
 		return nil, fmt.Errorf("failed to add items: %v", err)
 	}
+	if order.totalPrice < 100 {
+		return nil, fmt.Errorf("cannot create order with less than R$1")
+	}
 
 	return order, nil
 }

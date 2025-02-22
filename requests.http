@@ -1,4 +1,5 @@
-@orderId=01950796-e2e7-74c6-bf61-3c2fd91d9e2d
+@orderId=01952bbb-4a96-79c1-bd69-f47a8a74644
+@paymentId=01952e2d-73d0-7afb-9f05-d216463f8f0a
 @hostName=http://localhost:8080
 
 ## Place an Order
@@ -13,13 +14,13 @@ Content-Type: application/json
     {
       "code": "P001",
       "name": "Product 1",
-      "unit_price": 10.0,
+      "unit_price": 1500,
       "quantity": 2
     },
     {
       "code": "P002",
       "name": "Product 2",
-      "unit_price": 15.0,
+      "unit_price": 100,
       "quantity": 1
     }
   ]
@@ -36,4 +37,23 @@ Content-Type: application/json
 
 {
   "reason": "Customer requested cancellation"
+}
+
+### Get an Payment by Order Id
+# @name GetPaymentByOrderId
+GET {{hostName}}/api/payment/order/{{placeOrder.response.body.order_id}}
+
+### Get an Payment by PaymentId
+GET {{hostName}}/api/payment/{{GetPaymentByOrderId.response.body.payment.ID}}
+
+### Capture payment (send to eRede)
+POST {{hostName}}/api/payment/{{GetPaymentByOrderId.response.body.payment.ID}}/capture
+Content-Type: "application/json"
+
+{
+    "cardHolderName": "John Snow",
+    "cardNumber": "2223020000000005",
+    "expirationMonth": "01",
+    "expirationYear": "2028",
+    "securityCode": "123"
 }

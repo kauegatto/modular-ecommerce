@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="xE1C860Rz4oGugC2tapa" name="Architecture Overview">
-        <mxGraphModel dx="1902" dy="885" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="244" dy="502" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -64,7 +64,7 @@
                 <mxCell id="50" value="EVENT BUS - NATS.IO (Embedded)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;fontColor=default;labelBackgroundColor=none;labelBorderColor=none;" parent="1" vertex="1">
                     <mxGeometry x="55" y="301" width="885" height="29" as="geometry"/>
                 </mxCell>
-                <mxCell id="52" value="&lt;h1&gt;Notes:&lt;/h1&gt;&lt;div&gt;&lt;ol&gt;&lt;li&gt;We're using a modular monolith, so bounded contexts should be well defined and respected at &lt;b&gt;all &lt;/b&gt;costs&lt;/li&gt;&lt;li&gt;We will deal with &quot;distribucted transactions&quot; by using SAGA pattern.&lt;/li&gt;&lt;li&gt;Our application acknlowdges at-least-once delivery thus the need to implement dedup / idempotency - Hopefully treated by NATS&lt;/li&gt;&lt;li&gt;Each module will hopefully use Hexagonal Arch (But may not, depending on it's size I may keep it in a single main.go if I really want to).&lt;/li&gt;&lt;li&gt;It is not thought how we'll deal with concurrency (out of order / in order processing given that even in-order may be done on goroutines).&lt;/li&gt;&lt;li&gt;Redecard will be used as payment gateway :)&lt;/li&gt;&lt;/ol&gt;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;fontSize=18;" parent="1" vertex="1">
+                <mxCell id="52" value="&lt;h1&gt;Notes:&lt;/h1&gt;&lt;div&gt;&lt;ol&gt;&lt;li&gt;We&#39;re using a modular monolith, so bounded contexts should be well defined and respected at &lt;b&gt;all &lt;/b&gt;costs&lt;/li&gt;&lt;li&gt;We will deal with &quot;distribucted transactions&quot; by using SAGA pattern.&lt;/li&gt;&lt;li&gt;Our application acknlowdges at-least-once delivery thus the need to implement dedup / idempotency - Hopefully treated by NATS&lt;/li&gt;&lt;li&gt;Each module will hopefully use Hexagonal Arch (But may not, depending on it&#39;s size I may keep it in a single main.go if I really want to).&lt;/li&gt;&lt;li&gt;It is not thought how we&#39;ll deal with concurrency (out of order / in order processing given that even in-order may be done on goroutines).&lt;/li&gt;&lt;li&gt;Redecard will be used as payment gateway :)&lt;/li&gt;&lt;/ol&gt;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;fontSize=18;" parent="1" vertex="1">
                     <mxGeometry x="35" y="700" width="775" height="340" as="geometry"/>
                 </mxCell>
                 <mxCell id="58" value="common" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" parent="1" vertex="1">
@@ -101,7 +101,7 @@
         </mxGraphModel>
     </diagram>
     <diagram id="KAdzTB_DEehnYHPMhaGk" name="Order">
-        <mxGraphModel dx="1342" dy="625" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="974" dy="502" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -123,10 +123,10 @@
                 <mxCell id="bIMxI7ikGBcxRzjk5-OE-67" value="" style="group" parent="NEcNuCVIkw7OjsjBTimr-1" vertex="1" connectable="0">
                     <mxGeometry y="310" width="280" height="120" as="geometry"/>
                 </mxCell>
-                <mxCell id="NEcNuCVIkw7OjsjBTimr-6" value="&lt;ul&gt;&lt;li&gt;Address&lt;/li&gt;&lt;li&gt;Pedency&lt;/li&gt;&lt;li&gt;PaymentAmount&lt;/li&gt;&lt;/ul&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;" parent="bIMxI7ikGBcxRzjk5-OE-67" vertex="1">
+                <mxCell id="NEcNuCVIkw7OjsjBTimr-6" value="&lt;ul&gt;&lt;li&gt;Address&lt;/li&gt;&lt;li&gt;PaymentAmount&lt;/li&gt;&lt;/ul&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;" parent="bIMxI7ikGBcxRzjk5-OE-67" vertex="1">
                     <mxGeometry width="280" height="120" as="geometry"/>
                 </mxCell>
-                <mxCell id="lz79MSeleSsVwzCMMc6W-3" value="VO's" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="bIMxI7ikGBcxRzjk5-OE-67" vertex="1">
+                <mxCell id="lz79MSeleSsVwzCMMc6W-3" value="VO&#39;s" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="bIMxI7ikGBcxRzjk5-OE-67" vertex="1">
                     <mxGeometry x="110" width="60" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="bIMxI7ikGBcxRzjk5-OE-40" value="Order Status" style="swimlane;startSize=30;horizontal=1;childLayout=flowLayout;flowOrientation=north;resizable=0;interRankCellSpacing=50;containerType=tree;fontSize=12;" parent="1" vertex="1">
@@ -187,13 +187,13 @@
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="bIMxI7ikGBcxRzjk5-OE-52" value="Order pending indicate it has pending issues" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
-                    <mxGeometry x="545" y="760" width="260" height="30" as="geometry"/>
+                    <mxGeometry x="545" y="770" width="260" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="bIMxI7ikGBcxRzjk5-OE-53" value="after payment" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
                     <mxGeometry x="525" y="535" width="100" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="bIMxI7ikGBcxRzjk5-OE-54" value="Order" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" parent="1" vertex="1">
-                    <mxGeometry x="25" y="480" width="490" height="268" as="geometry"/>
+                    <mxGeometry x="25" y="480" width="490" height="216" as="geometry"/>
                 </mxCell>
                 <mxCell id="bIMxI7ikGBcxRzjk5-OE-55" value="+ OrderId: OrderId" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="bIMxI7ikGBcxRzjk5-OE-54" vertex="1">
                     <mxGeometry y="26" width="490" height="26" as="geometry"/>
@@ -210,26 +210,20 @@
                 <mxCell id="bIMxI7ikGBcxRzjk5-OE-58" value="+ OrderStatus: OrderStatus" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="bIMxI7ikGBcxRzjk5-OE-54" vertex="1">
                     <mxGeometry y="130" width="490" height="26" as="geometry"/>
                 </mxCell>
-                <mxCell id="bIMxI7ikGBcxRzjk5-OE-62" value="+ Pendencies: List&lt;Pendency&gt;&#10;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="bIMxI7ikGBcxRzjk5-OE-54" vertex="1">
-                    <mxGeometry y="156" width="490" height="26" as="geometry"/>
-                </mxCell>
                 <mxCell id="bIMxI7ikGBcxRzjk5-OE-56" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="bIMxI7ikGBcxRzjk5-OE-54" vertex="1">
-                    <mxGeometry y="182" width="490" height="8" as="geometry"/>
+                    <mxGeometry y="156" width="490" height="8" as="geometry"/>
                 </mxCell>
                 <mxCell id="bIMxI7ikGBcxRzjk5-OE-57" value="+ Order(params): Order" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="bIMxI7ikGBcxRzjk5-OE-54" vertex="1">
-                    <mxGeometry y="190" width="490" height="26" as="geometry"/>
+                    <mxGeometry y="164" width="490" height="26" as="geometry"/>
                 </mxCell>
                 <mxCell id="bIMxI7ikGBcxRzjk5-OE-63" value="+ ChangeStatus(OrderStatus): err" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="bIMxI7ikGBcxRzjk5-OE-54" vertex="1">
-                    <mxGeometry y="216" width="490" height="26" as="geometry"/>
-                </mxCell>
-                <mxCell id="bIMxI7ikGBcxRzjk5-OE-66" value="+ AddPendencies(Pendency): Pendency" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="bIMxI7ikGBcxRzjk5-OE-54" vertex="1">
-                    <mxGeometry y="242" width="490" height="26" as="geometry"/>
+                    <mxGeometry y="190" width="490" height="26" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>
     </diagram>
     <diagram name="Copy of Order" id="x1vPUKLpuUCheEow0_rX">
-        <mxGraphModel dx="1342" dy="625" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="974" dy="502" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="65udlxbwhHrKZSYzAluk-0"/>
                 <mxCell id="65udlxbwhHrKZSYzAluk-1" parent="65udlxbwhHrKZSYzAluk-0"/>
@@ -248,7 +242,7 @@
                 <mxCell id="65udlxbwhHrKZSYzAluk-6" value="&lt;ul&gt;&lt;li&gt;Buyer (Aggregate Root)&lt;br&gt;&lt;/li&gt;&lt;li&gt;Order&lt;/li&gt;&lt;/ul&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;" parent="65udlxbwhHrKZSYzAluk-2" vertex="1">
                     <mxGeometry y="80" width="280" height="320" as="geometry"/>
                 </mxCell>
-                <mxCell id="65udlxbwhHrKZSYzAluk-7" value="VO's" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="65udlxbwhHrKZSYzAluk-2" vertex="1">
+                <mxCell id="65udlxbwhHrKZSYzAluk-7" value="VO&#39;s" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="65udlxbwhHrKZSYzAluk-2" vertex="1">
                     <mxGeometry x="110" y="400" width="60" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="65udlxbwhHrKZSYzAluk-8" value="Entities" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="65udlxbwhHrKZSYzAluk-2" vertex="1">
@@ -256,6 +250,74 @@
                 </mxCell>
                 <mxCell id="cf1oUK08KHIq11pFxMvD-0" value="Dados de pagamento vem de uma api dentro do bounded contexts de pagamento, que ouvirá webhook do gateway" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#FFFEFE;" parent="65udlxbwhHrKZSYzAluk-1" vertex="1">
                     <mxGeometry x="110" y="620" width="640" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="DBBKEuvxJ-JGGgUyd5wH-0" value="Payment Lifecycle" style="swimlane;startSize=30;horizontal=1;childLayout=flowLayout;flowOrientation=north;resizable=0;interRankCellSpacing=50;containerType=tree;fontSize=12;" vertex="1" parent="65udlxbwhHrKZSYzAluk-1">
+                    <mxGeometry x="70" y="670" width="418" height="380" as="geometry"/>
+                </mxCell>
+                <mxCell id="DBBKEuvxJ-JGGgUyd5wH-1" style="edgeStyle=none;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;noEdgeStyle=1;orthogonal=1;" edge="1" parent="DBBKEuvxJ-JGGgUyd5wH-0" source="DBBKEuvxJ-JGGgUyd5wH-2" target="DBBKEuvxJ-JGGgUyd5wH-7">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="298.65625" y="104"/>
+                            <mxPoint x="323.5625" y="115"/>
+                            <mxPoint x="323.5625" y="205"/>
+                            <mxPoint x="362.75" y="218"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="DBBKEuvxJ-JGGgUyd5wH-2" value="Payment Created" style="whiteSpace=wrap;html=1;" vertex="1" parent="DBBKEuvxJ-JGGgUyd5wH-0">
+                    <mxGeometry x="218.65625" y="50" width="100" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="DBBKEuvxJ-JGGgUyd5wH-14" style="edgeStyle=none;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;noEdgeStyle=1;orthogonal=1;" edge="1" parent="DBBKEuvxJ-JGGgUyd5wH-0" source="DBBKEuvxJ-JGGgUyd5wH-3" target="DBBKEuvxJ-JGGgUyd5wH-5">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="176.34375" y="192"/>
+                            <mxPoint x="144.75" y="218"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="DBBKEuvxJ-JGGgUyd5wH-3" value="PAYMENT_PENDING" style="whiteSpace=wrap;html=1;" vertex="1" parent="DBBKEuvxJ-JGGgUyd5wH-0">
+                    <mxGeometry x="159.8125" y="140" width="133.75" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="DBBKEuvxJ-JGGgUyd5wH-4" value="" style="html=1;rounded=1;curved=0;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startSize=6;endSize=6;noEdgeStyle=1;orthogonal=1;" edge="1" parent="DBBKEuvxJ-JGGgUyd5wH-0" source="DBBKEuvxJ-JGGgUyd5wH-2" target="DBBKEuvxJ-JGGgUyd5wH-3">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="268.65625" y="102"/>
+                            <mxPoint x="251.15625" y="128"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="DBBKEuvxJ-JGGgUyd5wH-5" value="PAYMENT_PENDING_REFUND" style="whiteSpace=wrap;html=1;" vertex="1" parent="DBBKEuvxJ-JGGgUyd5wH-0">
+                    <mxGeometry x="59" y="230" width="171.5" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="DBBKEuvxJ-JGGgUyd5wH-6" value="" style="html=1;rounded=1;curved=0;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startSize=6;endSize=6;noEdgeStyle=1;orthogonal=1;entryX=0.75;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="DBBKEuvxJ-JGGgUyd5wH-0" source="DBBKEuvxJ-JGGgUyd5wH-2" target="DBBKEuvxJ-JGGgUyd5wH-3">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="238.65625" y="102"/>
+                            <mxPoint x="176.34375" y="128"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="DBBKEuvxJ-JGGgUyd5wH-7" value="PAYMENT_COMPLETED" style="whiteSpace=wrap;html=1;" vertex="1" parent="DBBKEuvxJ-JGGgUyd5wH-0">
+                    <mxGeometry x="263.25" y="230" width="135" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="DBBKEuvxJ-JGGgUyd5wH-8" value="" style="html=1;rounded=1;curved=0;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startSize=6;endSize=6;noEdgeStyle=1;orthogonal=1;" edge="1" parent="DBBKEuvxJ-JGGgUyd5wH-0" source="DBBKEuvxJ-JGGgUyd5wH-3" target="DBBKEuvxJ-JGGgUyd5wH-7">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="251.15625" y="192"/>
+                            <mxPoint x="298.75" y="218"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="DBBKEuvxJ-JGGgUyd5wH-9" value="" style="html=1;rounded=1;curved=0;sourcePerimeterSpacing=0;targetPerimeterSpacing=0;startSize=6;endSize=6;noEdgeStyle=1;orthogonal=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="DBBKEuvxJ-JGGgUyd5wH-0" source="DBBKEuvxJ-JGGgUyd5wH-5" target="DBBKEuvxJ-JGGgUyd5wH-12">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="144.75" y="282"/>
+                            <mxPoint x="144.75" y="308"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="DBBKEuvxJ-JGGgUyd5wH-12" value="&lt;blockquote style=&quot;margin: 0 0 0 40px; border: none; padding: 0px;&quot;&gt;&lt;font style=&quot;color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;PAYMENT_REFUND_COMPLETED&lt;/font&gt;&lt;/blockquote&gt;" style="whiteSpace=wrap;html=1;align=center;" vertex="1" parent="DBBKEuvxJ-JGGgUyd5wH-0">
+                    <mxGeometry x="20" y="320" width="249.5" height="40" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>
