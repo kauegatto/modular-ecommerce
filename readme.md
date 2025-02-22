@@ -109,15 +109,23 @@ https://github.com/pressly/goose?tab=readme-ov-file#up-to
 
 * [X] Integration Events rename
 * [X] Conectar com banco
-* [-] Use natsConfig
+* [X] Use natsConfig
 * [ ] Jetstream
 * [ ] Inicialização e Atribuição melhor dos módulos
 * [X] Decidir entre switch ou parse de evento para eventos
-* [ ] Separar melhor o mapping de tipos internos para tipos externos de IntegrationEvents
+* [X] Separar melhor o mapping de tipos internos para tipos externos de IntegrationEvents
 * [X] Inicialização do módulo melhorada, principalmente dos subscribers
 * [ ] Add otel & logging
 * [x] Introduce sqlc
+* [X] Integrate withe eRede!
 
 ### Para minha facilidade: PGCli
 
 `pgcli 'postgres://admin%40pgadmin.com:admin@localhost:5432/postgres'`
+
+## Problemas conhecidos
+
+* N+1 Query, diversos lugares, diversas vezes - é o que mais me incomoda.
+* NATS não implementa jetstream e persistência
+* Falta de retry de eventos em todas as operações
+* Falta de implementação do outbox pattern
