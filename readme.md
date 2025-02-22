@@ -20,7 +20,6 @@ Para agilizar e promover mais segurança no desenvolvimento, optei por utilizar 
 
 > verificar `src//Order/query.sql`
 
-
 ## Atualizar camada de infra
 
 ```bash
@@ -37,7 +36,6 @@ Somos capazes de voltar para pontos prefixados do passado, voltar apenas um ou u
 
 Da documentação
 > sqlc does not perform database migrations for you. However, sqlc is able to differentiate between up and down migrations. sqlc ignores down migrations when parsing SQL files.
-
 > sqlc supports parsing migrations from the following tools:
 >
 > * atlas
@@ -56,6 +54,7 @@ schema: "db/migrations"
 ### Configurar o goose
 
 com env:
+
 ```bash
 GOOSE_DRIVER=DRIVER
 GOOSE_DBSTRING=DBSTRING
@@ -94,6 +93,7 @@ $ Created new file: 00001_add_some_column.sql
 ```
 
 ### Resto dos comandos
+
 https://github.com/pressly/goose?tab=readme-ov-file#up-to
 
 ## 🧾 To-dos
@@ -108,3 +108,7 @@ https://github.com/pressly/goose?tab=readme-ov-file#up-to
 * [X] Inicialização do módulo melhorada, principalmente dos subscribers
 * [ ] Add otel & logging
 * [x] Introduce sqlc
+
+### Para minha facilidade: PGCli
+
+`pgcli 'postgres://admin%40pgadmin.com:admin@localhost:5432/postgres'`
