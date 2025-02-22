@@ -23,16 +23,27 @@ func NewPaymentPostgresRepository(db *pgxpool.Pool) PostgresRepository {
 }
 
 func (repo PostgresRepository) Create(ctx context.Context, Payment *models.Payment) error {
+	kind, err := repo.getDbKind(ctx, &Payment.Kind)
+	if err != nil {
+		return fmt.Errorf("error getting paymentKind from db %v", err)
+	}
+
+	status, err := repo.getDbStatus(ctx, &Payment.Status)
+	if err != nil {
+		return fmt.Errorf("error getting paymentStatus from db %v", err)
+	}
+
 	request := store.CreatePaymentParams{
 		ID:                   Payment.ID,
 		Orderid:              Payment.OrderId,
 		Totalamount:          int64(Payment.TotalPrice),
 		CreatedAt:            pgtype.Timestamp{Time: Payment.CreatedAt, Valid: true},
 		Integratorexternalid: pgtype.Text{String: Payment.ExternalIntegratorID, Valid: true},
-		KindID:               0,
-		StatusID:             0,
+		KindID:               kind.ID,
+		StatusID:             status.ID,
 	}
-	_, err := repo.queries.CreatePayment(ctx, request)
+
+	_, err = repo.queries.CreatePayment(ctx, request)
 	if err != nil {
 		return fmt.Errorf("error creating payment %v", err)
 
@@ -108,6 +119,35 @@ func (repo PostgresRepository) getPaymentStatus(ctx context.Context, statusID in
 	return &modelstatus, nil
 }
 
+func (repo PostgresRepository) getDbKind(ctx context.Context, kind *models.PaymentKind) (*store.PaymentKind, error) {
+	allKinds, err := repo.queries.GetPaymentKind(ctx) // estava com preguiça de fazer isso melhor, todo
+	if err != nil {
+		return nil, fmt.Errorf("error getting payment kinds from db: %w", err)
+	}
+
+	for _, k := range allKinds {
+		if k.Name == string(*kind) {
+			return &k, nil
+		}
+	}
+
+	return nil, fmt.Errorf("kind not found: %s", *kind)
+}
+
+func (repo PostgresRepository) getDbStatus(ctx context.Context, status *models.PaymentStatus) (*store.PaymentStatus, error) {
+	allStatuses, err := repo.queries.ListStatus(ctx) // estava com preguiça de fazer isso melhor, todo
+	if err != nil {
+		return nil, fmt.Errorf("error getting payment statuses from db: %w", err)
+	}
+
+	for _, s := range allStatuses {
+		if s.Name == string(*status) {
+			return &s, nil
+		}
+	}
+
+	return nil, fmt.Errorf("status not found: %s", *status)
+}
 func (repo PostgresRepository) paymentDbModelToModel(ctx context.Context, payment store.Payment) (*models.Payment, error) {
 	kind, err := repo.getPaymentKind(ctx, payment.KindID)
 	if err != nil {
