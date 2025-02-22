@@ -95,9 +95,8 @@ func (p *ERedeProcessor) Capture(ctx context.Context, card *models.Card, payment
 	if err != nil {
 		return ports.CaptureTransactionResponse{}, fmt.Errorf("error creating request: %w", err)
 	}
-
+	req.SetBasicAuth(p.config.PV, p.config.Token)
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Basic "+p.config.Token)
 	req.Header.Set("ApplicationId", p.config.PV)
 
 	resp, err := p.client.Do(req)
