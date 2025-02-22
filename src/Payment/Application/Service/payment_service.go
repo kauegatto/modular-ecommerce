@@ -215,7 +215,7 @@ func (s *PaymentService) AddExternalId(ctx context.Context, PaymentID models.Pay
 	}
 	err = payment.AddExternalIntegratorID(externalId)
 	if err != nil {
-		return fmt.Errorf("error completing payment %v", err)
+		return fmt.Errorf("add integrator externalId payment %v", err)
 	}
 	err = s.paymentRepository.Update(ctx, payment)
 	if err != nil {

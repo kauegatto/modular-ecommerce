@@ -40,10 +40,42 @@ func (h *PaymentHandler) handleGetPayment(c *gin.Context) {
 	})
 }
 
-func (h *PaymentHandler) handleCapturePayment(c *gin.Context) {
-	paymentId := parseToDomainIdAndReturnIfInvalid(c)
+type CapturePaymentBody struct {
+	CardHolderName  string `json:"cardHolderName" binding:"required"`
+	CardNumber      string `json:"cardNumber" binding:"required"`
+	ExpirationMonth string `json:"expirationMonth" binding:"required"`
+	ExpirationYear  string `json:"expirationYear" binding:"required"`
+	SecurityCode    string `json:"securityCode" binding:"required"`
+}
 
-	if err := h.PaymentService.ConfirmPayment(c, paymentId); err != nil {
+func (h *PaymentHandler) handleCapturePayment(c *gin.Context) {
+	paymentID := parseToDomainIdAndReturnIfInvalid(c)
+
+	var req CapturePaymentBody
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Invalid request body",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	card, err := models.NewCard(
+		req.CardNumber,
+		req.SecurityCode,
+		req.ExpirationMonth,
+		req.ExpirationYear,
+		req.CardHolderName,
+	)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Invalid card information",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	if err := h.PaymentService.CapturePayment(c, paymentID, card); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -51,7 +83,7 @@ func (h *PaymentHandler) handleCapturePayment(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Payment completed successfully",
+		"message": "Payment captured successfully",
 	})
 }
 
