@@ -8,6 +8,7 @@ import (
 	"ecommerce/Payment/Domain/ports"
 	"ecommerce/SharedKernel/eventBus"
 	"fmt"
+	"log/slog"
 	"time"
 )
 
@@ -65,6 +66,7 @@ func (s *PaymentService) handleCreatePayment(event eventBus.Event) error {
 }
 
 func (s *PaymentService) handleOrderCancelled(event eventBus.Event) error {
+	slog.Info("Order cancellation event received. Will request refund")
 	parsedEvent, ok := event.(*incoming.OrderCancelled)
 	if !ok {
 		return fmt.Errorf("expected OrderCancelled, got %T", event)
@@ -133,6 +135,31 @@ func (s *PaymentService) ConfirmPayment(ctx context.Context, PaymentID models.Pa
 	return nil
 }
 
+func (s *PaymentService) ConfirmRefund(ctx context.Context, PaymentID models.PaymentID) error {
+	payment, err := s.GetPaymentById(ctx, PaymentID)
+	if err != nil {
+		return fmt.Errorf("error getting payment %v", err)
+	}
+	err = payment.ConfirmRefund()
+	if err != nil {
+		return fmt.Errorf("error completing refund %v", err)
+	}
+
+	err = s.paymentRepository.Update(ctx, payment)
+	if err != nil {
+		return fmt.Errorf("error refunding payment on database %v", err)
+	}
+
+	paymentCompleted := outgoing.PaymentRefundConfirmed{
+		OrderID:   payment.OrderId,
+		PaymentID: PaymentID,
+		Amount:    string(payment.TotalPrice),
+		Time:      time.Now(),
+	}
+	s.eventBus.Publish(paymentCompleted)
+	return nil
+}
+
 func (s *PaymentService) RequestPaymentRefund(ctx context.Context, PaymentID models.PaymentID) error {
 	payment, err := s.GetPaymentById(ctx, PaymentID)
 	if err != nil {
@@ -153,6 +180,7 @@ func (s *PaymentService) RequestPaymentRefund(ctx context.Context, PaymentID mod
 	if err != nil {
 		return fmt.Errorf("error requesting payment cancellation %v", err)
 	}
+	slog.Info("Refund requested for paymentId %s successfully, externalId is %s", payment.ID.String(), payment.ExternalIntegratorID)
 
 	paymentCancelled := outgoing.PaymentRefundRequested{
 		OrderID:   payment.OrderId,

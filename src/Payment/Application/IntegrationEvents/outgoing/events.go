@@ -39,24 +39,24 @@ func (p PaymentRefundRequested) Name() string {
 	return "PaymentCancelRequested"
 }
 
-type PaymentCancelConfirmed struct {
+type PaymentRefundConfirmed struct {
 	OrderID   string
 	PaymentID uuid.UUID
 	Amount    string
 	Time      time.Time
 }
 
-func (p PaymentCancelConfirmed) Name() string {
+func (p PaymentRefundConfirmed) Name() string {
 	return "PaymentCancelConfirmed"
 }
 
-type PaymentCancelDenied struct {
+type PaymentRefundDenied struct {
 	OrderID   string
 	PaymentID uuid.UUID
 	Amount    string
 	Time      time.Time
 }
 
-func (p PaymentCancelDenied) Name() string {
+func (p PaymentRefundDenied) Name() string {
 	return "PaymentCancelDenied"
 }

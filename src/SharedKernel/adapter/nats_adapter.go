@@ -36,6 +36,7 @@ func (n *NatsEventbusAdapter) Publish(event eventBus.Event) error {
 		log.Printf("Unable to send message of name %s. Publish failed: %v", event.Name(), err)
 		return err
 	}
+	log.Printf("Event %s published", event.Name())
 	return nil
 }
 
