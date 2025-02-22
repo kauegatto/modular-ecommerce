@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -63,7 +64,7 @@ func (p *ERedeProcessor) Capture(ctx context.Context, card *models.Card, payment
 	expMonth, expYear := parseExpirationDate(expDate.String())
 
 	var kind string
-	if payment.Kind == models.PaymentKindCredit {
+	if strings.EqualFold(string(payment.Kind), string(models.PaymentKindCredit)) {
 		kind = "credit"
 	} else {
 		kind = "debit"
