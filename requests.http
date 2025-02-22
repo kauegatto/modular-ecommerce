@@ -44,7 +44,7 @@ Content-Type: application/json
 GET {{hostName}}/api/payment/order/{{placeOrder.response.body.order_id}}
 
 ### Get an Payment by PaymentId
-GET {{hostName}}/api/payment/{{paymentId}}
+GET {{hostName}}/api/payment/{{GetPaymentByOrderId.response.body.payment.ID}}
 
 ### Capture payment (send to eRede)
 POST {{hostName}}/api/payment/{{GetPaymentByOrderId.response.body.payment.ID}}/capture
@@ -55,5 +55,5 @@ Content-Type: "application/json"
     "cardNumber": "2223020000000005",
     "expirationMonth": "01",
     "expirationYear": "2028",
-    "securityCode": "123",
+    "securityCode": "123"
 }

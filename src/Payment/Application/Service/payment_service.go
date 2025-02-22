@@ -180,7 +180,7 @@ func (s *PaymentService) RequestPaymentRefund(ctx context.Context, PaymentID mod
 	if err != nil {
 		return fmt.Errorf("error requesting payment cancellation %v", err)
 	}
-	slog.Info("Refund requested for paymentId %s successfully, externalId is %s", payment.ID.String(), payment.ExternalIntegratorID)
+	fmt.Printf("Refund requested for paymentId %s successfully, externalId is %s", payment.ID.String(), payment.ExternalIntegratorID)
 
 	paymentCancelled := outgoing.PaymentRefundRequested{
 		OrderID:   payment.OrderId,

@@ -159,6 +159,7 @@ func (repo PostgresRepository) getDbStatus(ctx context.Context, status *models.P
 
 	return nil, fmt.Errorf("status not found: %s", *status)
 }
+
 func (repo PostgresRepository) paymentDbModelToModel(ctx context.Context, payment store.Payment) (*models.Payment, error) {
 	kind, err := repo.getPaymentKind(ctx, payment.KindID)
 	if err != nil {
