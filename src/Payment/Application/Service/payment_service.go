@@ -99,10 +99,7 @@ func (s *PaymentService) CapturePayment(ctx context.Context, PaymentID models.Pa
 	captureResponse, err := s.transactionProcessor.Capture(ctx, card, payment)
 	if err != nil {
 		if strings.EqualFold(string(payment.Kind), string(models.PaymentKindDebit)) {
-			err = s.RequestPaymentRefund(ctx, PaymentID)
-			if err != nil {
-				return err
-			}
+			s.RequestPaymentRefund(ctx, PaymentID)
 		}
 		return fmt.Errorf("error processing payment %v", err)
 	}
